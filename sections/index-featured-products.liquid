@@ -1,0 +1,464 @@
+{{ 'section-featured-products.css' | asset_url | stylesheet_tag }}
+
+{%- assign productsCount = section.settings.products_count | plus: 0 -%}
+{%- assign productsView = section.settings.products_view -%}
+
+{%-  assign allProducts = false -%}
+{% if section.settings.all_view %}
+	{%-  assign allProducts = true -%}
+{% endif %}
+
+{%-  assign useC = false -%}
+{% if section.settings.carousel_view %}
+	{%-  assign useC = true -%}
+{% endif %}
+
+
+<div class="section-style-{{ section.id }} {{ section.settings.design_type }}">
+   {%- include 'section-style' -%}
+   <div class="{{ section.settings.container_width }}">
+	
+	   {% unless section.settings.use_tabs %}
+			{% if section.settings.section_title.size > 0 %}
+				<h2 class="section_heading mb-0 text-center">{{ section.settings.section_title | escape }}</h2>
+			{% endif %}
+			{% if section.settings.section_subtitle.size > 0 %}
+				<p class="text text-center mt-1 mb-0">{{ section.settings.section_subtitle | escape }}</p>
+			{% endif %}
+		{% endunless %}
+	   
+	   {% if section.blocks.size > 0 %}
+		{% if section.settings.use_tabs %}
+	  	 <div class="tab_content_wrapper">
+		   <div class="tab_navigation row">
+			   	 {% if section.settings.section_title.size > 0 %}
+				 	 <div class="col-lg-auto">
+				 		<h2 class="section_heading">{{ section.settings.section_title | escape }}</h2>
+				 	 </div>
+			   	 {% endif %}
+			   	 {%- assign block_counter = 0 | plus: 0 -%}
+			   	 <div class="col-lg-auto">
+        		 	<span class="text-lg-right mt-lg-0 my-2 text-center d-block">
+						{% for block in section.blocks %}
+				 			{%- assign block_counter = block_counter | plus: 1 -%}
+				 			{%- assign collection_title = collections[block.settings.block_collection].title -%}
+				 			<span class="tab_nav tab_nav_{{ block_counter }} {% if block_counter == 1 %}active{% endif %}" data-tab="{{ block_counter | minus: 1 }}">{% if block.settings.block_collection_title.size > 0 %}{{ block.settings.block_collection_title }}{% else %}{{ collection_title }}{% endif %}</span>
+						{% endfor %}
+       			 	</span>
+			   	 </div>
+		   </div>
+		
+		   <div class="tab_content">
+		  {% endif %}
+		  
+		 {%- assign block_counter = 0 -%}
+	  	 {% for block in section.blocks %}
+	   	 	{%- assign block_counter = block_counter | plus: 1 -%}
+	   	 	{%- assign collection = collections[block.settings.block_collection] -%}
+			   {% if useC %}
+			 {% if section.settings.use_tabs %}
+			   <div class="tab_item fade tab_item_{{ block_counter }} {% if block_counter == 1 %}active{% endif %}">
+			 {% endif %}
+				   {% if useC %}
+					   {% unless section.settings.use_tabs %}
+						   <div class="row">
+					  		{% if block.settings.section_title.size > 0 %}
+							    <div class="col-lg-auto">
+							   	   <h2 class="section_heading mb-3 text-lg-left">{{ block.settings.section_title | escape }}</h2>
+							    </div>
+					  		{% endif %}
+					   {% endunless %}
+					   {% if section.settings.design_type == 'type_2' %}
+					 	 <div class="swiper-nav-wrapper col-lg-auto">
+							   <div id="prev_{{ block.id }}" class="swiper-button-prev"></div>
+							   <div id="next_{{ block.id }}" class="swiper-button-next"></div>
+					 	 </div>
+					   {% endif %}
+						{% unless section.settings.use_tabs %}
+							</div>
+						{% endunless %}
+				   {% endif %}
+					<div id="zmz-carousel-{{ block.id }}" class="swiper-container zmz-swiper-container{% if section.settings.use_tabs %} mt-3{% else %} mt-4{% endif %} swiper-nav-wrapper"
+		 			data-options='{
+						"observer": true,
+						"observeParents": true,
+						"pagination": {"el": "#pagination_{{ block.id }}", {% if section.settings.carousel_control_type == 'fraction' %}"type": "fraction"{% elsif section.settings.carousel_control_type == 'progressbar' %}"type": "progressbar"{% else %}"clickable": true{% endif %}},
+						"navigation": {"nextEl": "#next_{{ block.id }}", "prevEl": "#prev_{{ block.id }}"},
+						"spaceBetween": 30,
+						"slidesPerView": 1,
+						{% if section.settings.carousel_control_type == 'fraction' %}"slidesPerGroup": 2, {% endif %}
+						"breakpoints": {
+							"400": { "slidesPerView": 2{% if section.settings.carousel_control_type == 'fraction' %},"slidesPerGroup": 2 {% endif %} },
+							"640": { "slidesPerView": 3{% if section.settings.carousel_control_type == 'fraction' %},"slidesPerGroup": 3 {% endif %} },
+							"1024": {"slidesPerView": {{ productsView }}{% if section.settings.carousel_control_type == 'fraction' %},"slidesPerGroup": {{ productsView }} {% endif %} }
+						}
+					}'>
+				{% if allProducts %}
+					<div class="swiper-wrapper product_listing__main product_listing__grid mx-0">
+						{% for product in collection.products %}
+							<div class="swiper-slide">
+								<div class="product_item_wrap px-0">
+									{% include 'product-listing-item' product: product %}
+								</div>
+							</div>
+						{% endfor %}
+					</div>
+					{% else %}
+					<div class="swiper-wrapper product_listing__main product_listing__grid mx-0">
+						{% for product in collection.products limit:productsCount %}
+							<div class="swiper-slide">
+								<div class="product_item_wrap px-0">
+									{% include 'product-listing-item' product: product %}
+								</div>
+							</div>
+						{% endfor %}
+					</div>
+				{% endif %}
+				{% unless section.settings.off_carousel_pag %}
+					<div id="pagination_{{ block.id }}" class="swiper-pagination"></div>
+				{% endunless %}
+				{% unless section.settings.off_carousel_nav %}
+					{% unless section.settings.design_type == 'type_2' %}
+						<div id="prev_{{ block.id }}" class="swiper-button-prev"></div>
+						<div id="next_{{ block.id }}" class="swiper-button-next"></div>
+					{% endunless %}
+				{% endunless %}
+			</div>
+			 {% if section.settings.use_tabs %}
+			   </div>
+			 {% endif %}
+				
+			 {% else %}
+				 
+			   {% if section.settings.use_tabs %}
+			   <div class="tab_item fade tab_item_{{ block_counter }} {% if block_counter == 1 %}active{% endif %}">
+				   {% endif %}
+				   {% unless section.settings.use_tabs %}
+					   {% if block.settings.section_title.size > 0 %}
+				  	 	 <div class="section_heading_wrap">
+					 	 	   {% if block.settings.section_title.size > 0 %}
+					 	 			<h2 class="section_heading mb-1 text-lg-left">{{ block.settings.section_title | escape }}</h2>
+					 	 	   {% endif %}
+				  	 	 </div>
+					   {% endif %}
+				   {% endunless %}
+				<div class="product_listing__main product_listing__grid row {% if section.settings.use_tabs %} mt-3{% else %} mt-4{% endif %}">
+					{% if allProducts %}
+						{% for product in collection.products %}
+							<div class="col-6 col-md-4 col-{{ section.settings.column_item }} product_item_wrap">
+								{% include 'product-listing-item' product: product %}
+							</div>
+						{% endfor %}
+					{% else %}
+						{% for product in collection.products limit:productsCount %}
+							<div class="col-6 col-md-4 col-{{ section.settings.column_item }} product_item_wrap">
+								{% include 'product-listing-item' product: product %}
+							</div>
+						{% endfor %}
+					{% endif %}
+				</div>
+			 {% if section.settings.use_tabs %}
+				   </div>
+			 {% endif %}
+			{% endif %}
+	  	 {% endfor %}
+			
+		 {% if section.settings.use_tabs %}
+		   </div>
+		 </div>
+	   {% endif %}
+	{% endif %}
+   </div>
+</div>
+
+
+
+
+
+{% schema %}
+{
+	"name": "Featured Products",
+	"class": "section section_homepage section_products-carousel section_featured-products-tabs",
+	"settings": [
+		{
+			"id": "section_title",
+			"type": "text",
+			"label": "Section Heading",
+			"default": "Popular products"
+		},
+		{
+			"id": "section_subtitle",
+			"type": "text",
+			"label": "Section Subheading",
+			"default": "Top sale in this week"
+		},
+		{
+			"type":      "select",
+			"id":        "container_width",
+			"label":     "Container width",
+			"options": [
+				 {
+                  "value": "container",
+                  "label": "Box"
+       			 },
+                 {
+                   "value": "container-fluid",
+                   "label": "Container Fluid"
+                 },
+                 {
+                   "value": "full-width",
+                   "label": "Full"
+                 }
+			],
+			"default":   "container"
+		},
+	
+		{
+            "type": "color",
+            "id": "bg_section",
+            "label": "Background Section",
+            "default": "#ffffff"
+   		},
+		{
+            "type": "text",
+            "id": "inset_section",
+            "label": "Inset Section",
+            "default": "0px 0px 0px 0px",
+			"info": "inset: Top Right Bottom Left (px/em/%/). Or use one value if all insets are equal"
+   		},
+		{
+            "type": "text",
+            "id": "offset_section",
+            "label": "Offset Section",
+            "default": "0px 0px 0px 0px",
+            "info": "offset: Top Right Bottom Left"
+   		},
+	
+		{
+			"type": "checkbox",
+			"id": "use_tabs",
+			"label": "Use tabs collections",
+			"info": "Select > 1 collection",
+			"default":  false
+		},
+	
+		{
+			"type": "header",
+			"content": "Grid settings"
+		},
+	
+		{
+			"type": "checkbox",
+			"id": "all_view",
+			"label": "View all products in the collection",
+			"info": "Or use select count of products",
+			"default":  false
+		},
+
+		{
+		"type": "select",
+		"id": "products_count",
+		"label": "Count of products from the collection",
+			"options": [
+				{
+					"value": "2",
+					"label": "2"
+				},
+				{
+					"value": "3",
+					"label": "3"
+				},
+				{
+					"value": "4",
+					"label": "4"
+				},
+				{
+					"value": "5",
+					"label": "5"
+				},
+				{
+					"value": "6",
+					"label": "6"
+				},
+				{
+					"value": "7",
+					"label": "7"
+				},
+				{
+					"value": "8",
+					"label": "8"
+				},
+				{
+					"value": "9",
+					"label": "9"
+				},
+				{
+					"value": "10",
+					"label": "10"
+				},
+				{
+					"value": "11",
+					"label": "11"
+				},
+				{
+					"value": "12",
+					"label": "12"
+				}
+			],
+			"default": "8"
+		},
+
+		{
+			"type": "select",
+			"id": "column_item",
+			"label": "Width of Columns(not apply to carousel)",
+				"options": [
+					{
+						"value": "xl-2",
+						"label": "width 16,66%"
+					},
+					{
+						"value": "xl-2-5",
+						"label": "width 20%"
+					},
+					{
+						"value": "xl-3",
+						"label": "width 25%"
+					},
+					{
+						"value": "xl-4",
+						"label": "width 33.3333%"
+					},
+					{
+						"value": "xl-6",
+						"label": "width 50%"
+					}
+				],
+			"default": "xl-4"
+		},
+
+		{
+			"type": "header",
+			"content": "Carousel settings"
+		},
+		{
+			"type": "checkbox",
+			"id": "carousel_view",
+			"label": "Use carousel",
+			"default":  false
+		},
+		{
+			"type": "select",
+			"id": "products_view",
+			"label": "Carousel count of products",
+			"options": [
+				{
+					"value": "3",
+					"label": "3"
+				},
+				{
+					"value": "4",
+					"label": "4"
+				},
+				{
+					"value": "5",
+					"label": "5"
+				},
+				{
+					"value": "6",
+					"label": "6"
+				}
+			],
+			"default": "4"
+		},
+	
+		{
+			"type": "checkbox",
+			"id": "off_carousel_nav",
+			"label": "Disable carousel navigation",
+			"default":  false
+		},
+		{
+			"type": "checkbox",
+			"id": "off_carousel_pag",
+			"label": "Disable carousel pagination",
+			"default":  false
+		},
+		{
+			"type": "select",
+			"id": "carousel_control_type",
+			"label": "Pagination type",
+			"options": [
+				{
+					"value": "pagination",
+					"label": "Bullets"
+				},
+				{
+					"value": "fraction",
+					"label": "Fraction"
+				},
+				{
+					"value": "progressbar",
+					"label": "Progressbar"
+				}
+			],
+			"default": "pagination"
+		},
+		{
+			"type": "select",
+			"id": "design_type",
+			"label": "Design type",
+			"options": [
+				{
+					"value": "type_1",
+					"label": "Type 1"
+				},
+				{
+					"value": "type_2",
+					"label": "Type 2"
+				},
+				{
+					"value": "type_3",
+					"label": "Type 3"
+				}
+			],
+			"default": "type_1"
+		}
+	],
+	"blocks": [
+	// collection tab ===================================================================================
+		{
+			"type": "collection_tab",
+			"name": "Collection",
+			"settings": [
+				{
+					"type": "text",
+					"id": "section_title",
+					"label": "Title collection (For layout few collections without tabs)"
+				},
+				{
+					"type": "text",
+					"id": "block_collection_title",
+					"label": "Tab title"
+				},
+				{
+					"type": "collection",
+					"id": "block_collection",
+					"label": "Collection"
+				}
+			]
+		}
+	],
+	"presets": [
+		{
+			"name": "Featured Products",
+			"category": "Products",
+			"blocks": [
+				{
+					"type": "collection_tab"
+				}
+			]
+		}
+	]
+}
+{% endschema %}

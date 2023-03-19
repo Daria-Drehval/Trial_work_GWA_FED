@@ -1,0 +1,16 @@
+{% if shop.customer_accounts_enabled and settings.wishlist_toggle == true and settings.wishlist_page != '' %}
+	{% assign zemez_wishlist = customer.metafields.zemez_modules.wishlist %}
+	<div class="header_wishlist header_icon">
+		<a class="wishlist-link" href="{{ pages[settings.wishlist_page].url }}" title="{{ 'layout.wishlist.wishlist' | t }}">
+			{% unless ss_item.view_wishlist == 'type-1' %}
+				<span class="link_text">{{ 'layout.wishlist.wishlist' | t }}</span>
+			{% endunless %}
+			
+			<svg class="svg-icon {% if ss_item.view_wishlist == 'type-2' %} hidden-xl {% endif %}" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path d="M12.001 4.52894C13.1436 3.50614 14.6345 2.95981 16.1674 3.00221C17.7003 3.04462 19.1587 3.67254 20.243 4.75694C21.3264 5.84013 21.9543 7.29669 21.9982 8.82803C22.0421 10.3594 21.4986 11.8495 20.479 12.9929L11.999 21.4849L3.52102 12.9929C2.50028 11.8489 1.95623 10.3575 2.00056 8.82492C2.04489 7.29235 2.67425 5.83489 3.75942 4.75177C4.84459 3.66865 6.30323 3.04205 7.83589 3.00061C9.36854 2.95917 10.8589 3.50604 12.001 4.52894ZM18.827 6.16994C18.1046 5.44807 17.1333 5.03002 16.1125 5.00157C15.0916 4.97312 14.0985 5.33642 13.337 6.01694L12.002 7.21494L10.666 6.01794C9.90406 5.33661 8.91013 4.97291 7.88837 5.00155C6.86662 5.03019 5.89462 5.44899 5.17202 6.17194C4.45628 6.88764 4.03848 7.84808 4.00285 8.85964C3.96722 9.8712 4.31641 10.8587 4.98002 11.6229L12 18.6539L19.02 11.6239C19.6844 10.8593 20.0339 9.87118 19.9981 8.85891C19.9623 7.84665 19.5438 6.88566 18.827 6.16994Z" />
+			</svg>
+			<span class="zemez_wishlist_total {% unless zemez_wishlist.size > 0 %} hidden{% endunless %}">{{ zemez_wishlist.size }}</span>
+		</a>
+	</div>
+{% endif %}
+

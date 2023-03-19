@@ -1,0 +1,1253 @@
+{{ 'section-image-text-overlay.css' | asset_url | stylesheet_tag }}
+
+<style>
+	
+	{% if section.settings.parallax %}
+			@media only screen and (max-width:1199px){
+				/* Height background image by padding */
+				.section-style-{{ section.id }} .img_bg__wrap, .section-style-{{ section.id }} .img_placeholder_wrapper {
+					padding: {{section.settings.padding_desktop | append: 'px' }} 0;
+				}
+				
+				@media (max-width:991px){
+					.section-style-{{ section.id }} .img_bg__wrap, .section-style-{{ section.id }} .img_placeholder_wrapper  {
+						padding: {{section.settings.padding_mobile | append: 'px' }} 0;
+					}
+				}
+				
+				/* Style background overlay */
+			{% if section.settings.use_bgo  %}
+				.section-style-{{ section.id }}  .img_bg__wrap:before {
+					content: '';
+					position: absolute;
+					top: 0;
+					left: 0;
+					right: 0;
+					bottom: 0;
+					display: block;
+					z-index: 1;
+					background-color: {{ section.settings.bg_color | color_modify: 'alpha', section.settings.bg_color_opacity  }};
+					transition: .3s;
+				}
+			{% endif %}
+			}
+			@media only screen and (min-width:1200px){
+				/* Height slide by paddings */
+				.section-style-{{ section.id }} .section_wrap {
+					padding: {{section.settings.padding_desktop | append: 'px' }} 0;
+				}
+				
+				@media (max-width:991px){
+					.section-style-{{ section.id }} .section_wrap  {
+						padding: {{section.settings.padding_mobile | append: 'px' }} 0;
+					}
+				}
+			
+				/* Style background overlay */
+				{% if section.settings.use_bgo  %}
+					.section-style-{{ section.id }}  .section_wrap:before {
+						content: '';
+						position: absolute;
+						top: 0;
+						left: 0;
+						right: 0;
+						bottom: 0;
+						display: block;
+						z-index: 1;
+						background-color: {{ section.settings.bg_color | color_modify: 'alpha', section.settings.bg_color_opacity  }};
+						transition: .3s;
+					}
+				{% endif %}
+		
+				/* Height parallax by padding */
+				.section-style-{{ section.id }} .img_bg__wrap, .section-style-{{ section.id }} .img_placeholder_wrapper {
+					padding: {{ section.settings.padding_parallax_desktop  | append: 'px' }} 0;
+					position: absolute;
+					top: 0;
+					right: 0;
+					left: 0;
+				}
+			}
+	
+	{% else %}
+		/* Height background image by padding */
+		.section-style-{{ section.id }} .img_bg__wrap, .section-style-{{ section.id }} .img_placeholder_wrapper {
+			padding: {{section.settings.padding_desktop | append: 'px' }} 0;
+		}
+		
+		@media (max-width:991px){
+			.section-style-{{ section.id }} .img_bg__wrap, .section-style-{{ section.id }} .img_placeholder_wrapper  {
+				padding: {{section.settings.padding_mobile | append: 'px' }} 0;
+			}
+		}
+	
+		/* Style background overlay */
+		{% if section.settings.use_bgo  %}
+		.section-style-{{ section.id }}  .img_bg__wrap:before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			display: block;
+			z-index: 1;
+			background-color: {{ section.settings.bg_color | color_modify: 'alpha', section.settings.bg_color_opacity  }};
+			transition: .3s;
+		}
+		{% endif %}
+	
+	{% endif %}
+	
+	
+	/* Style background position -x on mobile */
+	@media (max-width:575px){
+		.section-style-{{ section.id }} .img_bg__wrap  {
+			background-position-x: {{ section.settings.bg_pos_mobile | append: '%' }};
+		}
+	}
+	
+	/* Style inset caption */
+	.section-style-{{ section.id }}  .caption_text {
+		padding: {{ section.settings.inset_caption }};
+	}
+	
+	
+	{% if section.blocks.size > 0 %}
+		{% for block in section.blocks %}
+	
+			.section-style-{{ section.id }} .item-{{ block.id }} {
+				margin:  {{ block.settings.offset_block }};
+			}
+			.section-style-{{ section.id }} .item-{{ block.id }} .caption-item,
+			.section-style-{{ section.id }} .item-{{ block.id }}.block-timer {
+				color: {{ block.settings.color }};
+				padding: {{ block.settings.inset_block }};
+				{% if block.settings.use_bgi %}
+					background-color: {{ block.settings.bgc_color | color_modify: 'alpha', block.settings.bgc_color_opacity  }};
+				{% endif %}
+			}
+	
+			@media (min-width: 768px)  {
+				.section-style-{{ section.id }} .item-{{ block.id }}{
+					text-indent: {{ block.settings.indent_block }};
+				}
+			}
+		{% endfor %}
+	{% endif %}
+</style>
+
+<div class="section-style-{{ section.id }}">
+	{%- include 'section-style' -%}
+	
+	<div class="{{ section.settings.container_width }}">
+	
+		<div class="section_wrap {% if section.settings.parallax %} parallax_block-js{% endif %}">
+		{% if section.settings.image.size > 0 %}
+			 <div class="img_bg__wrap lazyload {% if section.settings.parallax %} parallax_layer-js{% endif %}"
+			 	data-bgset="{%- include 'bgset', image: section.settings.image -%}"
+			 	data-sizes="auto"
+			 	data-parent-fit="contain"
+			 ></div>
+		{% else %}
+			<div class="img_placeholder_wrapper {% if section.settings.parallax %} parallax_layer-js{% endif %}">
+				{{ 'image' | placeholder_svg_tag: 'img_placeholder' }}
+			</div>
+		{% endif %}
+		
+	<div class="section_txt align_{{ section.settings.caption_align }} {{ section.settings.section_view }} {{ section.settings.custom_class }}">
+		<div class="container"> 
+			<div class="caption_text text-{{ section.settings.text_align }} {% if section.settings.inverted %} inverted{% endif %}" {% if section.settings.caption_bg_color.size > 0 %}style="background-color: {{ section.settings.caption_bg_color | color_modify: 'alpha', section.settings.caption_bg_color_opacity  }}"{% endif %}>
+				{% for block in section.blocks %}
+					{% case block.type %}
+					{% when 'custom_heading' %}
+						{% if block.settings.custom_heading != blank %}
+							<div class="custom_large_title item-{{ block.id }}"><div class="caption-item">{{ block.settings.custom_heading }}</div></div>
+						{% endif %}
+					{% when 'heading_h1' %}
+						{% if block.settings.heading_h1 != blank %}
+							<div class="h1 item-{{ block.id }}"><div class="caption-item">{{ block.settings.heading_h1 }}</div></div>
+						{% endif %}
+					{% when 'heading_h2' %}
+						{% if block.settings.heading_h2 != blank %}
+							<div class="h2 item-{{ block.id }}"><div class="caption-item">{{ block.settings.heading_h2 }}</div></div>
+						{% endif %}
+					{% when 'heading_h3' %}
+						{% if block.settings.heading_h3 != blank %}
+							<div class="h3 item-{{ block.id }}"><div class="caption-item">{{ block.settings.heading_h3 }}</div></div>
+						{% endif %}
+					{% when 'heading_h4' %}
+						{% if block.settings.heading_h4 != blank %}
+							<div class="h4 item-{{ block.id }}"><div class="caption-item">{{ block.settings.heading_h4 }}</div></div>
+						{% endif %}
+					{% when 'heading_h5' %}
+						{% if block.settings.heading_h5 != blank %}
+							<div class="h5 item-{{ block.id }}"><div class="caption-item">{{ block.settings.heading_h5 }}</div></div>
+						{% endif %}
+					{% when 'heading_h6' %}
+						{% if block.settings.heading_h6 != blank %}
+							<div class="h6 item-{{ block.id }}"><div class="caption-item">{{ block.settings.heading_h6 }}</div></div>
+						{% endif %}
+					{% when 'subtitle' %}
+						{% if block.settings.subtitle != blank %}
+							<div class="subtitle_lg item-{{ block.id }}"><div class="caption-item">{{ block.settings.subtitle }}</div></div>
+						{% endif %}
+					{% when 'text' %}
+						{% if block.settings.text != blank %}
+							<div class="text-{{ block.settings.text_size }} item-{{ block.id }}"><div class="caption-item">{{ block.settings.text }}</div></div>
+						{% endif %}
+					{% when 'timer' %}
+						{%- if block.settings.time != blank -%}
+							<div class="js-countdown block-timer item-{{ block.id }}" data-time="{{ block.settings.time }}"></div>
+						{%- endif -%}
+					{% when 'button' %}
+						{% if block.settings.button_label.size > 0 and block.settings.button_link.size > 0 %}
+							<a href="{{ block.settings.button_link }}" class="{% if block.settings.use_button %}btn {{ block.settings.btn_style }} {{ block.settings.btn_size }}{% else %}link link-primary {% endif %}" style="margin: {{ block.settings.offset_block }};">{{ block.settings.button_label }}</a>
+						{% endif %}
+					{% when 'html' %}
+						{% if block.settings.code.size > 0 %}
+							{{ block.settings.code }}
+						{% endif %}
+					{% endcase %}
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+</div>
+
+	</div>
+</div>
+
+{% schema %}
+{
+	"name": "Image with text overlay",
+	"tag": "section",
+	"class": "section section_homepage section_image-with-text-overlay",
+	"max_blocks": 6,
+	"settings": [
+		{
+			"type": "header",
+			"content": "Section sittings"
+		},
+		{
+			"type":      "select",
+			"id":        "container_width",
+			"label":     "Container width",
+			"options": [
+				{
+					"value": "container",
+					"label": "Box"
+				},
+				{
+					"value": "container-fluid",
+					"label": "Container Fluid"
+				},
+				{
+					"value": "full-width",
+					"label": "Full"
+				}
+			],
+				"default":   "container"
+		},
+		
+		{
+			"type": "text",
+			"id": "inset_section",
+			"label": "Inset Section",
+			"default": "0px 0px 0px 0px",
+			"info": "inset: Top Right Bottom Left (px/em/%/). Or use one value if all insets are equal"
+		},
+
+		{
+			"type": "text",
+			"id": "offset_section",
+			"label": "Offset Section",
+			"default": "0px 0px 0px 0px",
+			"info": "offset: Top Right Bottom Left"
+		},
+
+		{
+			"type": "color",
+			"id": "bg_section",
+			"label": "Background Section",
+			"default": "#ffffff"
+		},
+
+		{
+			"type": "header",
+			"content": "Height background image"
+		},
+		
+		{
+			"type": "range",
+			"id": "padding_desktop",
+			"min": 200,
+			"max": 520,
+			"step": 5,
+			"unit": "px",
+			"label": "Padding desktop",
+			"default": 300,
+			"info": "Value is multiplied by 2 (x2). Example: you need height 600px, in this case you need to select value 300px"
+		},
+		{
+			"type": "range",
+			"id": "padding_mobile",
+			"min": 150,
+			"max": 250,
+			"step": 5,
+			"unit": "px",
+			"label": "Padding mobile",
+			"default": 175,
+			"info": "Value is multiplied by 2 (x2). Example: you need height 600px, in this case you need to select value 300px"
+		},
+	
+		{
+			"type": "image_picker",
+			"id": "image",
+			"label": "Image",
+			"info": "The image should be more than 2048px wide to resize and crop properly"
+		},
+	
+			{
+			"type": "range",
+			"id": "bg_pos_mobile",
+			"min": 0,
+			"max": 100,
+			"step": 1,
+			"unit": "%",
+			"label": "Horizontal background position on mobile",
+			"default": 50
+		},
+		
+		{
+			"type": "checkbox",
+			"id": "use_bgo",
+			"label": "Use background overlay",
+			"default": false
+		},
+		
+		{
+			"type": "color",
+			"id": "bg_color",
+			"label": "Color background overlay"
+		},
+		{
+			"type":      "range",
+			"id":        "bg_color_opacity",
+			"min":       0,
+			"max":        1,
+			"step":       0.1,
+			"label":     "Background opacity overlay",
+			"default":   0.5
+		},
+
+		{
+			"type": "header",
+			"content": "Parallax Settings"
+		},
+		{
+			"type": "checkbox",
+			"id": "parallax",
+			"label": "Use Parallax Desktop",
+			"default": false
+		},
+		
+		{
+			"type": "range",
+			"id": "padding_parallax_desktop",
+			"min": 200,
+			"max": 800,
+			"step": 10,
+			"unit": "px",
+			"label": "Height Parallax desktop",
+			"default": 500,
+			"info": "Height Parallax must be more height background image. Value is multiplied by 2 (x2). Example: you need height 600px, in this case you need to select value 300px"
+		},
+
+		{
+			"type": "header",
+			"content": "Caption Settings"
+		},
+		{
+			"type": "select",
+			"id": "caption_align",
+			"label": "Caption align",
+			"default": "center",
+			"options": [
+				{
+					"label": "Center",
+					"value": "center"
+				},
+				{
+					"label": "Right",
+					"value": "right"
+				},
+				{
+					"label": "Left",
+					"value": "left"
+				}
+			]
+		},
+
+		{
+			"type": "select",
+			"id": "text_align",
+			"label": "Text align",
+			"default": "center",
+				"options": [
+					{
+						"label": "Center",
+						"value": "center"
+					},
+					{
+						"label": "Right",
+						"value": "right"
+					},
+					{
+						"label": "Left",
+						"value": "left"
+					}
+				]
+		},
+		{
+			"type": "checkbox",
+			"id": "inverted",
+			"label": "Inverted",
+			"default": false
+		},
+	
+		{
+			"type": "checkbox",
+			"id": "use_bgc",
+			"label": "Use background caption",
+			"default": false
+		},
+		{
+			"type": "color",
+			"id": "caption_bg_color",
+			"label": "Caption background"
+		},
+		{
+	        "type":      "range",
+	        "id":        "caption_bg_color_opacity",
+	        "min":       0,
+	        "max":        1,
+	        "step":       0.1,
+	        "unit":       "px",
+	        "label":     "Background caption opacity",
+	        "default":   0.5
+		},
+		{
+			"type": "text",
+			"id": "inset_caption",
+			"label": "Inset Caption",
+			"default": "6% 7% 6% 7%",
+			"info": "inset: Top Right Bottom Left (px/em/%/). Or use one value if all insets are equal"
+		}
+	],
+	"blocks": [
+	
+		// CUSTOM HEADING //////////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "custom_heading",
+			"name": "Custom Heading",
+			"settings": [
+				{
+					"type": "richtext",
+					"id": "custom_heading",
+					"label": "Custom size heading",
+					"default": "<p>Custom Heading</p>"
+				},
+				
+				{
+					"type": "color",
+					"id": "color",
+					"label": "Color",
+					"default": "#121212"
+				},
+	
+				{
+					"type": "text",
+					"id": "indent_block",
+					"label": "Indent Block",
+					"default": "0",
+					"info": "Text indent: negative or positive value (px or %)"
+				},
+		
+				{
+					"type": "text",
+					"id": "inset_block",
+					"label": "Inset Block",
+					"default": "0 0 0 0",
+					"info": "inset: Top Right Bottom Left (px/em/%/). Or use one value if all insets are equal"
+				},
+				
+				{
+					"type": "text",
+					"id": "offset_block",
+					"label": "Offset Block",
+					"default": "5% 0 0 0",
+					"info": "offset: Top Right Bottom Left"
+				},
+				{
+					"type": "checkbox",
+					"id": "use_bgi",
+					"label": "Use background caption item",
+					"default": false
+				},
+				
+				{
+					"type": "color",
+					"id": "bgc_color",
+					"label": "Color background caption item"
+				},
+				{
+					"type":      "range",
+					"id":        "bgc_color_opacity",
+					"min":       0,
+					"max":        1,
+					"step":       0.1,
+					"label":     "Background opacity caption item",
+					"default":   0.5
+				}
+			]
+		},
+	
+		// HEADER H2 //////////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "heading_h1",
+			"name": "Heading H1",
+			"settings": [
+				{
+					"type": "richtext",
+					"id": "heading_h1",
+					"label": "H1",
+					"default": "<p>Heading</p>"
+				},
+				
+				{
+					"type": "color",
+					"id": "color",
+					"label": "Color",
+					"default": "#121212"
+				},
+				
+				{
+					"type": "text",
+					"id": "indent_block",
+					"label": "Indent Block",
+					"default": "0",
+					"info": "Text indent: negative or positive value (px or %)"
+				},
+				
+				{
+					"type": "text",
+					"id": "inset_block",
+					"label": "Inset Block",
+					"default": "0 0 0 0",
+					"info": "inset: Top Right Bottom Left (px/em/%/). Or use one value if all insets are equal"
+				},
+				
+				{
+					"type": "text",
+					"id": "offset_block",
+					"label": "Offset Block",
+					"default": "5% 0 0 0",
+					"info": "offset: Top Right Bottom Left"
+				},
+				{
+					"type": "checkbox",
+					"id": "use_bgi",
+					"label": "Use background caption item",
+					"default": false
+				},
+		
+				{
+					"type": "color",
+					"id": "bgc_color",
+					"label": "Color background caption item"
+					},
+					{
+					"type":      "range",
+					"id":        "bgc_color_opacity",
+					"min":       0,
+					"max":        1,
+					"step":       0.1,
+					"label":     "Background opacity caption item",
+					"default":   0.5
+				}
+			]
+		},
+	
+		// HEADER H2 //////////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "heading_h2",
+			"name": "Heading H2",
+			"settings": [
+				{
+					"type": "richtext",
+					"id": "heading_h2",
+					"label": "H2",
+					"default": "<p>Heading</p>"
+				},
+	
+				{
+					"type": "color",
+					"id": "color",
+					"label": "Color",
+					"default": "#121212"
+				},
+	
+				{
+					"type": "text",
+					"id": "indent_block",
+					"label": "Indent Block",
+					"default": "0",
+					"info": "Text indent: negative or positive value (px or %)"
+				},
+	
+				{
+					"type": "text",
+					"id": "inset_block",
+					"label": "Inset Block",
+					"default": "0 0 0 0",
+					"info": "inset: Top Right Bottom Left (px/em/%/). Or use one value if all insets are equal"
+				},
+				
+				{
+					"type": "text",
+					"id": "offset_block",
+					"label": "Offset Block",
+					"default": "5% 0 0 0",
+					"info": "offset: Top Right Bottom Left"
+				},
+				{
+					"type": "checkbox",
+					"id": "use_bgi",
+					"label": "Use background caption item",
+					"default": false
+				},
+				
+				{
+					"type": "color",
+					"id": "bgc_color",
+					"label": "Color background caption item"
+				},
+				{
+					"type":      "range",
+					"id":        "bgc_color_opacity",
+					"min":       0,
+					"max":        1,
+					"step":       0.1,
+					"label":     "Background opacity caption item",
+					"default":   0.5
+				}
+			]
+		},
+	
+		// HEADER H3 //////////////////////////////////////////////////////////////////////////////////////////
+		{
+		"type": "heading_h3",
+		"name": "Heading H3",
+			"settings": [
+				{
+					"type": "richtext",
+					"id": "heading_h3",
+					"label": "H3",
+					"default": "<p>Heading</p>"
+				},
+				
+				{
+					"type": "color",
+					"id": "color",
+					"label": "Color",
+					"default": "#121212"
+				},
+	
+				{
+					"type": "text",
+					"id": "indent_block",
+					"label": "Indent Block",
+					"default": "0",
+					"info": "Text indent: negative or positive value (px or %)"
+				},
+	
+				{
+					"type": "text",
+					"id": "inset_block",
+					"label": "Inset Block",
+					"default": "0 0 0 0",
+					"info": "inset: Top Right Bottom Left (px/em/%/). Or use one value if all insets are equal"
+				},
+				
+				{
+					"type": "text",
+					"id": "offset_block",
+					"label": "Offset Block",
+					"default": "5% 0 0 0",
+					"info": "offset: Top Right Bottom Left"
+				},
+				{
+					"type": "checkbox",
+					"id": "use_bgi",
+					"label": "Use background caption item",
+					"default": false
+				},
+				
+				{
+					"type": "color",
+					"id": "bgc_color",
+					"label": "Color background caption item"
+				},
+				{
+					"type":      "range",
+					"id":        "bgc_color_opacity",
+					"min":       0,
+					"max":        1,
+					"step":       0.1,
+					"label":     "Background opacity caption item",
+					"default":   0.5
+				}
+			]
+		},
+		// HEADER H4 //////////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "heading_h4",
+			"name": "Heading H4",
+			"settings": [
+					{
+					"type": "richtext",
+					"id": "heading_h4",
+					"label": "H4",
+					"default": "<p>Heading</p>"
+				},
+				
+				{
+					"type": "color",
+					"id": "color",
+					"label": "Color",
+					"default": "#121212"
+				},
+				
+				{
+					"type": "text",
+					"id": "inset_block",
+					"label": "Inset Block",
+					"default": "0 0 0 0",
+					"info": "inset: Top Right Bottom Left (px/em/%/). Or use one value if all insets are equal"
+				},
+				
+				{
+					"type": "text",
+					"id": "offset_block",
+					"label": "Offset Block",
+					"default": "5% 0 0 0",
+					"info": "offset: Top Right Bottom Left"
+				},
+				{
+					"type": "checkbox",
+					"id": "use_bgi",
+					"label": "Use background caption item",
+					"default": false
+				},
+				
+				{
+					"type": "color",
+					"id": "bgc_color",
+					"label": "Color background caption item"
+				},
+				{
+					"type":      "range",
+					"id":        "bgc_color_opacity",
+					"min":       0,
+					"max":        1,
+					"step":       0.1,
+					"label":     "Background opacity caption item",
+					"default":   0.5
+				}
+			]
+		},
+	
+		// HEADER H5 //////////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "heading_h5",
+			"name": "Heading H5",
+			"settings": [
+				{
+					"type": "richtext",
+					"id": "heading_h5",
+					"label": "H5",
+					"default": "<p>Heading</p>"
+				},
+				
+				{
+					"type": "color",
+					"id": "color",
+					"label": "Color",
+					"default": "#121212"
+				},
+				
+				{
+					"type": "text",
+					"id": "inset_block",
+					"label": "Inset Block",
+					"default": "0 0 0 0",
+					"info": "inset: Top Right Bottom Left (px/em/%/). Or use one value if all insets are equal"
+				},
+				
+				{
+					"type": "text",
+					"id": "offset_block",
+					"label": "Offset Block",
+					"default": "5% 0 0 0",
+					"info": "offset: Top Right Bottom Left"
+				},
+				{
+					"type": "checkbox",
+					"id": "use_bgi",
+					"label": "Use background caption item",
+					"default": false
+				},
+				
+				{
+					"type": "color",
+					"id": "bgc_color",
+					"label": "Color background caption item"
+				},
+				{
+					"type":      "range",
+					"id":        "bgc_color_opacity",
+					"min":       0,
+					"max":        1,
+					"step":       0.1,
+					"label":     "Background opacity caption item",
+					"default":   0.5
+				}
+			]
+		},
+	
+		// HEADER H6 //////////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "heading_h6",
+			"name": "Heading H6",
+			"settings": [
+				{
+					"type": "richtext",
+					"id": "heading_h6",
+					"label": "H6",
+					"default": "<p>Heading</p>"
+				},
+				
+				{
+					"type": "color",
+					"id": "color",
+					"label": "Color",
+					"default": "#121212"
+				},
+				
+				{
+					"type": "text",
+					"id": "inset_block",
+					"label": "Inset Block",
+					"default": "0 0 0 0",
+					"info": "inset: Top Right Bottom Left (px/em/%/). Or use one value if all insets are equal"
+				},
+				
+				{
+					"type": "text",
+					"id": "offset_block",
+					"label": "Offset Block",
+					"default": "5% 0 0 0",
+					"info": "offset: Top Right Bottom Left"
+				},
+				{
+					"type": "checkbox",
+					"id": "use_bgi",
+					"label": "Use background caption item",
+					"default": false
+				},
+				
+				{
+					"type": "color",
+					"id": "bgc_color",
+					"label": "Color background caption item"
+				},
+				{
+					"type":      "range",
+					"id":        "bgc_color_opacity",
+					"min":       0,
+					"max":        1,
+					"step":       0.1,
+					"label":     "Background opacity caption item",
+					"default":   0.5
+				}
+			]
+		},
+	
+	
+		// SUBTITLE  //////////////////////////////////////////////////////////////////////////////////////////////
+		{
+		"type": "subtitle",
+		"name": "Subtitle",
+		"settings": [
+			{
+				"type": "richtext",
+				"id": "subtitle",
+				"label": "Subtitle",
+				"default": "<p>Use overlay text to give your customers insight into your brand. Select imagery and text that relates to your style and story.<p>"
+			},
+	
+			{
+				"type": "color",
+				"id": "color",
+				"label": "Color",
+				"default": "#797B7E"
+			},
+			
+			{
+				"type": "text",
+				"id": "inset_block",
+				"label": "Inset Block",
+				"default": "0 0 0 0",
+				"info": "inset: Top Right Bottom Left (px/em/%/). Or use one value if all insets are equal"
+			},
+			
+			{
+				"type": "text",
+				"id": "offset_block",
+				"label": "Offset Block",
+				"default": "5% 0 0 0",
+				"info": "offset: Top Right Bottom Left"
+			},
+			{
+				"type": "checkbox",
+				"id": "use_bgc",
+				"label": "Use background caption item",
+				"default": false
+			},
+			
+			{
+				"type": "color",
+				"id": "bgc_color",
+				"label": "Color background caption item"
+			},
+			{
+				"type":      "range",
+				"id":        "bgc_color_opacity",
+				"min":       0,
+				"max":        1,
+				"step":       0.1,
+				"label":     "Background opacity caption item",
+				"default":   0.5
+			}
+		]
+		},
+
+		// TEXT  //////////////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "text",
+			"name": "Text",
+			"settings": [
+				{
+					"type": "richtext",
+					"id": "text",
+					"label": "Text",
+					"default": "<p>Use overlay text to give your customers insight into your brand. Select imagery and text that relates to your style and story.<p>"
+				},
+	
+				{
+					"type": "select",
+					"id": "text_size",
+					"label": "Text size",
+					"default": "medium",
+					"options": [
+						{
+							"label": "Small",
+							"value": "default"
+						},
+						{
+							"label": "Medium",
+							"value": "medium"
+						},
+						{
+							"label": "Large",
+							"value": "large"
+						}
+					]
+				},
+				
+				{
+					"type": "color",
+					"id": "color",
+					"label": "Color",
+					"default": "#797B7E"
+				},
+				
+				{
+					"type": "text",
+					"id": "inset_block",
+					"label": "Inset Block",
+					"default": "0 0 0 0",
+					"info": "inset: Top Right Bottom Left (px/em/%/). Or use one value if all insets are equal"
+				},
+				
+				{
+					"type": "text",
+					"id": "offset_block",
+					"label": "Offset Block",
+					"default": "5% 0 0 0",
+					"info": "offset: Top Right Bottom Left"
+				},
+				{
+					"type": "checkbox",
+					"id": "use_bgc",
+					"label": "Use background caption item",
+					"default": false
+				},
+				
+				{
+					"type": "color",
+					"id": "bgc_color",
+					"label": "Color background caption item"
+				},
+				{
+					"type":      "range",
+					"id":        "bgc_color_opacity",
+					"min":       0,
+					"max":        1,
+					"step":       0.1,
+					"label":     "Background opacity caption item",
+					"default":   0.5
+				}
+			]
+		},
+	
+		// TIMER //////////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "timer",
+			"name": "Countdown (timer)",
+			"settings": [
+				{
+					"type": "text",
+					"id": "time",
+					"label": "Time Deal",
+					"default": "2023-05-30T00:00:00"
+				},
+				
+				{
+					"type": "color",
+					"id": "color",
+					"label": "Color",
+					"default": "#121212"
+				},
+				
+				{
+					"type": "text",
+					"id": "inset_block",
+					"label": "Inset Block",
+					"default": "0 0 0 0",
+					"info": "inset: Top Right Bottom Left (px/em/%/). Or use one value if all insets are equal"
+				},
+				
+				{
+					"type": "text",
+					"id": "offset_block",
+					"label": "Offset Block",
+					"default": "5% 0 0 0",
+					"info": "offset: Top Right Bottom Left"
+				},
+				{
+					"type": "checkbox",
+					"id": "use_bgi",
+					"label": "Use background caption item",
+					"default": false
+				},
+				
+				{
+					"type": "color",
+					"id": "bgc_color",
+					"label": "Color background caption item"
+				},
+				{
+					"type":      "range",
+					"id":        "bgc_color_opacity",
+					"min":       0,
+					"max":        1,
+					"step":       0.1,
+					"label":     "Background opacity caption item",
+					"default":   0.5
+				}
+			]
+		},
+
+		// BUTTON  //////////////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "button",
+			"name": "Button",
+			"settings": [
+				{
+					"type": "text",
+					"id": "button_label",
+					"label": "Button label"
+				},
+				{
+					"type": "url",
+					"id": "button_link",
+					"label": "Button link"
+				},
+
+				{
+					"type": "checkbox",
+					"id": "use_button",
+					"label": "Use type button",
+					"default": true
+				},
+
+				{
+					"type": "radio",
+					"id": "btn_style",
+					"label": "Button style",
+					"default": "btn-primary",
+					"options": [
+						{
+							"value": "btn-default",
+							"label": "Default"
+						},
+						{
+							"value": "btn-primary",
+							"label": "Primary"
+						},
+						{
+							"value": "btn-secondary",
+							"label": "Secondary"
+						},
+						{
+							"value": "btn-alternate",
+							"label": "Alternate"
+						}
+					]
+				},
+				{
+					"type": "radio",
+					"id": "btn_size",
+					"label": "Button size",
+					"default": "btn-lg",
+					"options": [
+						{
+							"value": "btn-sm",
+							"label": "Small"
+						},
+						{
+							"value": "btn-md",
+							"label": "Medium"
+						},
+						{
+							"value": "btn-lg",
+							"label": "Large"
+						}
+					]
+				},
+				{
+					"type": "text",
+					"id": "offset_block",
+					"label": "Offset Block",
+					"default": "5% 0 0 0",
+					"info": "offset: Top Right Bottom Left"
+				}
+			]
+		},
+		// CUSTOM HTML ////////////////////////////////////////////////////////////////////////////////////
+		{
+			"type": "html",
+			"name": "Custom HTML",
+			"settings": [
+				{
+					"type": "text",
+					"id": "custom_class",
+					"label": "Custom class"
+				},
+				{
+					"type": "textarea",
+					"id": "code",
+					"label": "HTML"
+				}
+			]
+		}
+	],
+	"presets": [
+		{
+			"name": "Image with text overlay",
+			"category": "Banner",
+			"blocks": [
+				{
+					"type": "heading_h6"
+				},
+				{
+					"type": "heading_h3"
+				},
+				{
+					"type": "text"
+				},
+				{
+					"type": "button"
+				}
+			]
+		}
+	]
+}
+{% endschema %}
+
+{% javascript %}
+jQuery(function($){
+	zmzParallax = function() {
+		$('.parallax_block-js').each(function() {
+			var parallaxBlock = $(this);
+			
+			var parallaxLayer = $(this).find('.parallax_layer-js');
+	
+			window.addEventListener('scroll', function() {
+				var parallaxHeight = parseInt(parallaxBlock.outerHeight());
+				var parallaxImgHeight = parseInt(parallaxLayer.outerHeight());
+
+				var parallaxOffset1 = parseInt( parallaxBlock.offset().top);
+				var parallaxOffset2 = parseInt( parallaxOffset1 + parallaxHeight );
+
+				var translateMax = parseInt( parallaxImgHeight - parallaxHeight ) - 2; // minus 2 to prevent floated numbers and borders between sections
+
+				var scrollTemp = $(window).scrollTop() + window.innerHeight;
+
+				if ( ( scrollTemp >= parallaxOffset1 ) && ( $(window).scrollTop() <= parallaxOffset2 ) ) {
+					// var translateZMZ = parallaxHeight/parallaxImgHeight;
+ 
+					// if ( translateZMZ > 0.2 ) {
+					//	var translateVal = parseInt( ( scrollTemp - parallaxOffset1 ) * 0.2 );
+					// }
+					// else {
+					//	var translateVal = parseInt( ( scrollTemp - parallaxOffset1 ) * translateZMZ );
+					// };
+
+					var translateVal = parseInt( ( scrollTemp - parallaxOffset1 ) * 0.3 );
+					var translateVal_2 = parseInt( ( scrollTemp - parallaxOffset1 ) * 0.1 );
+
+					if ( translateVal <= translateMax ) {
+						parallaxLayer.css({ 'transform' : 'translate3d(0, -' + translateVal + 'px, 0)' });
+					}
+					else if ( translateVal > translateMax ) {
+						parallaxLayer.css({ 'transform' : 'translate3d(0, -' + translateMax + 'px, 0)' });
+					};
+				};
+			});
+		});
+	};
+	if ( $(window).width() > 1199 ) {
+		zmzParallax();
+	}
+
+	$(document).on('shopify:section:load shopify:section:unload', '.section_image-with-text-overlay', function() {
+		if ( $(window).width() > 1199 ) {
+			zmzParallax();
+		}
+	});
+});
+
+{% endjavascript %}

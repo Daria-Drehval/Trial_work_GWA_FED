@@ -1,0 +1,517 @@
+{{ 'section-lookbook.css' | asset_url | stylesheet_tag }}
+
+{%- assign item = section.settings -%}
+
+{%- if section.blocks.size > 0 -%}
+	<style>
+		{%- for block in section.blocks -%}
+			.section_lookbook .section-style-{{ section.id }} .item-{{ block.id }} {
+				margin-top: {{ block.settings.offset_block_top | append: "px" }};
+			}
+		{%- endfor -%}
+	</style>
+{% endif %}
+
+<div class="section-style-{{ section.id }}">
+	{%- include 'section-style' -%}
+	<div class="{{ section.settings.container_width }}">
+			{% if item.section_title.size > 0 or item.text_title.size > 0 %}
+				<div class="text-center container-md mb-5">
+					<h2 class="section_heading mb-0"><span>{{ item.section_title }}</span></h2>
+					<p><span>{{ item.text_title }}</span></p>
+				</div>
+			{% endif %}
+		
+  		<div class="row {% if section.settings.reset_indent %}gx-0{% endif %}">
+			{%- if section.blocks.size > 0 -%}
+			{%- for block in section.blocks -%}
+				{%- assign bl_it = block.settings -%}
+				<div class="col-md-{{ bl_it.image_column }} item-{{ block.id }}">
+				<div class="lookbook_item_wrap">
+					<div class="lookbook_img">
+						{%- if bl_it.image.size != blank -%}
+							<div class="image-item-wrapper" style="padding-top:{{ 1 | divided_by: bl_it.image.aspect_ratio | times: 100}}%;">
+								{% assign img_url = bl_it.image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
+								<img class="image-content__image lazyload"
+									 src="{{ bl_it.image | img_url: '300x300' }}"
+									 data-src="{{ img_url }}"
+									 data-widths="[180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 1944, 2048]"
+									 data-aspectratio="{{ bl_it.image.aspect_ratio }}"
+									 data-sizes="auto"
+									 data-parent-fit="cover"
+									 alt="{{ bl_it.image.alt | escape }}"/>
+							</div>
+						{%- else -%}
+							<div class="img_placeholder__wrap" style="padding-top: 52.6%;">
+								{{ 'image' | placeholder_svg_tag: 'img_placeholder' }}
+							</div>
+						{%- endif -%}
+					</div>
+					{%- for i in (1..4) -%}
+						{%- assign spotX = 'item_x_' | append: i -%}{%- assign spotX = bl_it[spotX] -%}
+						{%- assign spotY = 'item_y_' | append: i -%}{%- assign spotY = bl_it[spotY] -%}
+						{%- assign spotV = 'item_vertical_align_' | append: i -%}{%- assign spotV = bl_it[spotV] -%}
+						{%- assign spotH = 'item_horizontal_align_' | append: i -%}{%- assign spotH = bl_it[spotH] -%}
+						{%- assign spotProduct = 'item_product_' | append: i -%}{%- assign spotProduct = bl_it[spotProduct] -%}
+						{%- unless spotProduct == blank -%}
+						{%- assign itemProduct = all_products[spotProduct] -%}
+							<div class="lookbook_container"	>
+							<div class="lookbook_item caption_{{ spotH }} caption_{{ spotV }}" style="left: {{ spotX }}%;top: {{ spotY }}%;">
+							{%- if itemProduct.id.size > 0 -%}
+								<a class="lookbook_item__bullet" href="{{ itemProduct.url }}">
+									<i aria-hidden="true">
+										<svg width="9" height="9" viewBox="0 0 9 9" fill="none" xmlns="http://www.w3.org/2000/svg">
+											<rect x="4" width="1" height="9" fill="#121212"/>
+											<rect x="9" y="4" width="1" height="9" transform="rotate(90 9 4)" fill="#121212"/>
+										</svg>
+									</i>
+								</a>
+								<a class="lookbook_item__caption" href="{{ itemProduct.url }}">
+									<div class="d-flex align-items-center">
+										<img class="img-fluid w-100" src="{{ itemProduct.featured_image.src | product_img_url: '88x112', crop: 'top'  }}" alt="{{ itemProduct.featured_image.alt }}">
+										<div>
+											<span class="product_name d-block">{{ itemProduct.title | truncate:38 }}</span>
+											<span class="product-price money">{{ itemProduct.price | money }}</span>
+										</div>
+									</div>
+								</a>
+							{%- else -%}
+								<i class="fa fa-plus lookbook_item__bullet" aria-hidden="true"></i>
+							{%- endif -%}
+						</div>
+						</div>
+						{%- endunless -%}
+					{%- endfor -%}
+				
+				</div>
+			</div>
+			{%- endfor -%}
+			{%- else -%}
+				<span style="display: flex; justify-content: center;">This section doesn’t currently include any content. Add block to this section using the sidebar.</span>
+			{%- endif -%}
+		</div>
+	</div>
+</div>
+{% schema %}
+{
+	"name": "Lookbook",
+	"class": "section section_homepage section_lookbook",
+	"max_blocks": 7,
+	"settings": [
+		{
+			"type":      "select",
+			"id":        "container_width",
+			"label":     "Container width",
+			"options": [
+				{
+					"value": "container",
+					"label": "Box"
+				},
+				{
+					"value": "container-fluid",
+					"label": "Container Fluid"
+				},
+				{
+					"value": "full-width",
+					"label": "Full"
+				}
+			],
+				"default":   "container"
+		},
+		
+		{
+			"type": "checkbox",
+			"id": "reset_indent",
+			"label": "Remove indent",
+			"default":   false
+		},
+		{
+			"type": "text",
+			"id": "section_title",
+			"label": "Section Title"
+		},
+		{
+			"type": "text",
+			"id": "text_title",
+			"label": "Text Title"
+		},
+		{
+			"type": "text",
+			"id": "inset_section",
+			"label": "Inset Section",
+			"default": "0px 0px 0px 0px",
+			"info": "inset: Top Right Bottom Left (px/em/%/). Or use one value if all insets are equal"
+		},
+		
+		{
+			"type": "text",
+			"id": "offset_section",
+			"label": "Offset Section",
+			"default": "0px 0px 0px 0px",
+			"info": "offset: Top Right Bottom Left"
+		},
+		
+		{
+			"type": "color",
+			"id": "bg_section",
+			"label": "Background Section",
+			"default": "#ffffff"
+		}
+	],
+	"blocks": [
+		{
+			"type": "lookbook",
+			"name": "Lookbook product",
+			"settings": [
+				{
+					"type":      "select",
+					"id":        "image_column",
+					"label":     "Image Column width",
+					"default": "6",
+					"options": [
+						{
+							"value": "2",
+							"label": "16.67%"
+						},
+						{
+							"value": "3",
+							"label": "25%"
+						},
+						{
+							"value": "4",
+							"label": "33.33%"
+						},
+						{
+							"value": "5",
+							"label": "41.67%"
+						},
+						{
+							"value": "6",
+							"label": "50%"
+						},
+						{
+							"value": "7",
+							"label": "58.33%"
+						},
+						{
+							"value": "8",
+							"label": "66.67%"
+						},
+						{
+							"value": "9",
+							"label": "75%"
+						},
+						{
+							"value": "10",
+							"label": "83.33%"
+						},
+						{
+							"value": "12",
+							"label": "100%"
+						}
+					]
+				},
+	
+				{
+					"type": "text",
+					"id": "offset_block_top",
+					"label": "Top Offset block",
+					"default": "0",
+					"info": "Default 0"
+				},
+	
+				{
+					"type": "image_picker",
+					"id": "image",
+					"label": "Image"
+				},
+				{
+					"type": "header",
+					"content": "Product 1"
+				},
+				{
+					"type": "product",
+					"id": "item_product_1",
+					"label": "Select Product"
+				},
+
+				{
+					"type":    "range",
+					"id":      "item_x_1",
+					"min":     1,
+					"max":     100,
+					"step":    1,
+					"unit":    "%",
+					"label":   "Horizontal position",
+					"default": 50
+				},
+				{
+					"type":    "range",
+					"id":      "item_y_1",
+					"min":     1,
+					"max":     100,
+					"step":    1,
+					"unit":    "%",
+					"label":   "Vertical position",
+					"default": 50
+				},
+				{
+					"type": "radio",
+					"id": "item_horizontal_align_1",
+					"label": "Caption horizontal align",
+					"default": "left",
+					"options": [
+						{
+							"value": "left",
+							"label": "Left"
+						},
+						{
+							"value": "right",
+							"label": "Right"
+						}
+					]
+				},
+				{
+					"type": "radio",
+					"id": "item_vertical_align_1",
+					"label": "Caption vertical align",
+					"default": "bottom",
+					"options": [
+						{
+							"value": "top",
+							"label": "Top"
+						},
+						{
+							"value": "bottom",
+							"label": "Bottom"
+						}
+					]
+				},
+				{
+					"type": "header",
+					"content": "Product 2"
+				},
+				{
+					"type": "product",
+					"id": "item_product_2",
+					"label": "Select Product"
+				},
+
+				{
+					"type":    "range",
+					"id":      "item_x_2",
+					"min":     1,
+					"max":     100,
+					"step":    1,
+					"unit":    "%",
+					"label":   "Horizontal position",
+					"default": 50
+				},
+				{
+					"type":    "range",
+					"id":      "item_y_2",
+					"min":     1,
+					"max":     100,
+					"step":    1,
+					"unit":    "%",
+					"label":   "Vertical position",
+					"default": 50
+				},
+				{
+					"type": "radio",
+					"id": "item_horizontal_align_2",
+					"label": "Caption horizontal align",
+					"default": "left",
+					"options": [
+						{
+							"value": "left",
+							"label": "Left"
+						},
+						{
+							"value": "right",
+							"label": "Right"
+						}
+					]
+				},
+				{
+					"type": "radio",
+					"id": "item_vertical_align_2",
+					"label": "Caption vertical align",
+					"default": "bottom",
+					"options": [
+						{
+							"value": "top",
+							"label": "Top"
+						},
+						{
+							"value": "bottom",
+							"label": "Bottom"
+						}
+					]
+				},
+				{
+					"type": "header",
+					"content": "Product 3"
+				},
+				{
+					"type": "product",
+					"id": "item_product_3",
+					"label": "Select Product"
+				},
+
+				{
+					"type":    "range",
+					"id":      "item_x_3",
+					"min":     1,
+					"max":     100,
+					"step":    1,
+					"unit":    "%",
+					"label":   "Horizontal position",
+					"default": 50
+				},
+				{
+					"type":    "range",
+					"id":      "item_y_3",
+					"min":     1,
+					"max":     100,
+					"step":    1,
+					"unit":    "%",
+					"label":   "Vertical position",
+					"default": 50
+				},
+				{
+					"type": "radio",
+					"id": "item_horizontal_align_3",
+					"label": "Caption horizontal align",
+					"default": "left",
+					"options": [
+						{
+							"value": "left",
+							"label": "Left"
+						},
+						{
+							"value": "right",
+							"label": "Right"
+						}
+					]
+				},
+				{
+					"type": "radio",
+					"id": "item_vertical_align_3",
+					"label": "Caption vertical align",
+					"default": "bottom",
+					"options": [
+						{
+							"value": "top",
+							"label": "Top"
+						},
+						{
+							"value": "bottom",
+							"label": "Bottom"
+						}
+					]
+				},
+				{
+					"type": "header",
+					"content": "Product 4"
+				},
+				{
+					"type": "product",
+					"id": "item_product_4",
+					"label": "Select Product"
+				},
+
+				{
+					"type":    "range",
+					"id":      "item_x_4",
+					"min":     1,
+					"max":     100,
+					"step":    1,
+					"unit":    "%",
+					"label":   "Horizontal position",
+					"default": 50
+				},
+				{
+					"type":    "range",
+					"id":      "item_y_4",
+					"min":     1,
+					"max":     100,
+					"step":    1,
+					"unit":    "%",
+					"label":   "Vertical position",
+					"default": 50
+				},
+				{
+					"type": "radio",
+					"id": "item_horizontal_align_4",
+					"label": "Caption horizontal align",
+					"default": "left",
+					"options": [
+						{
+							"value": "left",
+							"label": "Left"
+						},
+						{
+							"value": "right",
+							"label": "Right"
+						}
+					]
+				},
+				{
+					"type": "radio",
+					"id": "item_vertical_align_4",
+					"label": "Caption vertical align",
+					"default": "bottom",
+					"options": [
+						{
+							"value": "top",
+							"label": "Top"
+						},
+						{
+							"value": "bottom",
+							"label": "Bottom"
+						}
+					]
+				}
+			]
+		}
+	],
+	"presets": [
+		{
+			"name": "Lookbook",
+			"category": "Products",
+			"blocks": [
+				{
+					"type": "lookbook"
+				},
+				{
+					"type": "lookbook"
+				}
+			]
+		}
+	]
+}
+{% endschema %}
+
+{% javascript %}
+jQuery(document).ready(function($) {
+	$(window).on('load resize', function() {
+		if ( $(window).width() < 991 ) {
+			$('.lookbook_item__bullet').each(function(i) {
+				var self = $(this);
+				var productLink = self.attr('href');
+				var prodCaption = self.siblings('.lookbook_item__caption');
+					
+				self.on('click', function(e){
+					e.preventDefault();
+					prodCaption.show(300);
+				});
+
+				prodCaption.on('click', function(e){
+					document.location.href = productLink;
+				});
+			});
+		};
+	});
+});
+{% endjavascript %}

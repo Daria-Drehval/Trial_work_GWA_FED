@@ -1,0 +1,73 @@
+/**
+ * Section banners
+ */
+
+.section_banners .banner-item {
+    position: relative;
+}
+
+.banner-item .caption *:not(.btn) + .btn {
+    margin-top: 1.1rem;
+}
+
+.banner-item .caption * + .block-title,
+.banner-item .caption * + .block-text {
+    margin-top: 0.8rem;
+}
+
+.section_banners .banner-caption {
+    position: relative;
+}
+
+.section_banners .banner-item .caption .caption_text {
+    position: relative;
+    z-index: 3;
+}
+
+.section_banners .banner-caption.inverted *:not(.btn) {
+    color: var(--color-white);
+}
+
+.section_banners .style-standard .banner-caption p {
+    margin: 0;
+}
+
+.section_banners .style-standard .banner-caption .text-banner {
+    font-size: 18px;
+    line-height: 1.667;
+    color: var(--color-black);
+}
+
+.section_banners .style-standard .banner-caption p + a {
+    margin-top: 20px;
+}
+.section_banners .banner-item {
+    margin-bottom: 0;
+}
+@media (max-width: 767px) {
+    .section_banners .banner-caption {
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+    .section_banners .banner-item .caption .caption_text {
+        padding-bottom: 20px;
+    }
+}
+
+
+ .full-width .section_banners .caption.container {
+     padding-left: 0;
+     padding-right: 0;
+ }
+
+
+.section_banners .image-item-container {
+    position: relative;
+}
+
+.section_banners .image-item-wrapper {
+    display: block;
+    margin: 0 auto;
+}
+

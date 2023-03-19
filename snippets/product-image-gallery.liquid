@@ -1,0 +1,477 @@
+
+{% case settings.pg_modal_mainthumb %}
+{% when 'square'  %}
+  {%- assign product_image_zoom_size = '1000x1000' -%}
+{% when 'rectangle' %}
+  {%- assign product_image_zoom_size = '1024x1280' -%}
+{% endcase %}
+
+{%- assign product_image_scale = settings.pg_zoom_levelscale -%}
+{%- assign product_image_thumb = 'x150' -%}
+{%- assign img_alignment = 'center' -%}
+{%- assign pr_img_min_size = 'small' -%}
+{%- assign fimage = product.featured_image -%}
+{%- assign fpr_img_url = fimage | product_img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+{%- assign is_zoom = false -%}
+{% if settings.pg_zoom != blank %}
+  {%- assign is_zoom = true -%}
+{% endif %}
+{%- assign use_pg_sticky = false -%}
+{% if settings.use_pg_sticky %}
+  {%- assign use_pg_sticky = true -%}
+{% endif %}
+
+{% case p_item.product_view_type %}
+  {% when 'carousel-vertical'  %}
+  {%- assign product_info_class = 'col-lg-5 stickyimgprheight-js' -%}
+<div class="single_product__img col-12 col-md-10 offset-md-1 offset-lg-0 col-lg-7 mb-3">
+  <div class="image-gallery-container {% if use_pg_sticky %} stickyimgpr-js{% endif %}">
+ 
+    {% case product.images.size %}
+    {% when 0 %}
+     <img class="img-fluid lazyload lazypreload" src="{{ 'no_image.png' | asset_url }}" alt="" />
+    {% when 1 %}
+      <div class="product__img_wrap">
+        <img class="{% if is_zoom %}item-zoom-js{% endif %} lazyload lazypreload"
+            {% if is_zoom %}
+              data-zoom-image="{{ product.featured_image.src | product_img_url: product_image_zoom_size, scale: product_image_scale }}"
+            {% endif %}
+             src="{{ product.featured_image.src | product_img_url: pr_img_min_size }}"
+             data-src="{{ fpr_img_url }}"
+             data-widths="[157, 270, 360, 540, 720, 900]"
+             data-sizes="auto"
+             alt="{{ product.featured_image.alt }}" />
+      </div>
+    {% else %}
+      <div class="gallery_thumbs_wrapper">
+        <div id="gallery_thumbs-{{ section.id }}" class="swiper-container gallery_thumbs">
+          <div class="swiper-wrapper">
+            {% for image in product.images %}
+  
+              {%- assign image = image.src -%}
+              {%- assign product_img_url = image | product_img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+              
+              <div class="swiper-slide" data-k="{{ image.aspect_ratio }}">
+                {% if settings.pg_modalgallery %}
+                  <a class="image-gallery no-click"
+                     rel="fancybox"
+                     data-thumbnail="{{ image.src | product_img_url: product_image_thumb, crop: img_alignment }}"
+                     href="{{ image.src | product_img_url: product_image_zoom_size, crop: img_alignment }}">
+                    <img class="lazyload lazypreload"
+                         src="{% include 'srcEmpty' %}"
+                         data-src="{{ image.src | product_img_url: product_image_thumb, crop: img_alignment }}" alt="{{ image.alt }}"/>
+                  </a>
+                {% endif %}
+                <img class="lazyload lazypreload"
+                     src="{{ image.src | product_img_url: pr_img_min_size }}"
+                     data-src="{{ product_img_url }}"
+                     data-widths="[157, 270]"
+                     data-sizes="auto"
+                     alt="{{ image.alt }}" />
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% if settings.pg_nav %}
+          <div class="swiper-button-prev button-thumbs-next out-container"></div>
+          <div class="swiper-button-next button-thumbs-prev out-container"></div>
+        {% endif %}
+      </div>
+      <div id="gallery_big-{{ section.id }}" class="swiper-container gallery_cover">
+        {% if product.images.size > 1 and settings.pg_modalgallery %}
+          <a  id="btnImgGallery" class="product__img_zoom">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18 7H22V9H16V3H18V7ZM8 9H2V7H6V3H8V9ZM18 17V21H16V15H22V17H18ZM8 15V21H6V17H2V15H8Z" fill="black"/>
+            </svg>
+          </a>
+        {% endif %}
+        
+        {% render 'product-badge' %}
+        
+        <div class="swiper-wrapper">
+
+          <div class="swiper-slide">
+            <img class="{% if is_zoom %}item-zoom-js {% endif %} lazyload lazypreload"
+                {% if is_zoom %}
+                  data-zoom-image="{{product.featured_image.src | product_img_url:  product_image_zoom_size, scale: product_image_scale }}"
+                {% endif %}
+                 src="{{ product.featured_image.src | product_img_url: pr_img_min_size }}"
+                 id="primary_img_{{ section.id }}"
+                 data-src="{{ fpr_img_url }}"
+                 data-widths="[157, 270, 360, 540, 720, 900]"
+                 data-sizes="auto"
+                 alt="{{ product.images.first.alt }}" />
+          </div>
+          
+          {% for image in product.images offset:1 %}
+            {%- assign image = image.src -%}
+            {%- assign product_img_url = image | product_img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+            <div class="swiper-slide">
+              <img class="{% if is_zoom %}item-zoom-js {% endif %} lazyload lazypreload"
+                   {% if is_zoom %}
+                      data-zoom-image="{{ image.src | product_img_url:  product_image_zoom_size, scale: product_image_scale }}"
+                   {% endif %}
+                   src="{{ image.src | product_img_url: pr_img_min_size }}"
+                   data-src="{{ product_img_url }}"
+                   data-widths="[157, 270, 360, 540, 720, 900]"
+                   data-sizes="auto"
+                   alt="{{ image.alt }}" />
+            </div>
+          {% endfor %}
+        </div>
+        
+        {% if settings.pg_pag %}
+          <div id="pagination_{{ section.id }}" class="swiper-pagination sw-pb"></div>
+        {% endif %}
+        {% if settings.pg_fraction %}
+          <div class="swiper-counter"></div>
+        {% endif %}
+        {% if settings.pg_nav %}
+          <div class="swiper-button-prev button-cover-prev"><span>{{ 'layout.pagination.previous' | t }}</span></div>
+          <div class="swiper-button-next button-cover-next"><span>{{ 'layout.pagination.next' | t }}</span></div>
+        {% endif %}
+      </div>
+    {% endcase %}
+  </div>
+</div>
+
+{% when 'carousel-horizontal'  %}
+	{%- assign product_info_class = 'col-lg-6 stickyimgprheight-js' -%}
+<div class="single_product__img col-12 col-sm-10 offset-sm-1 offset-lg-0 col-lg-6 mb-3">
+<div class="image-gallery-container {% if use_pg_sticky %} stickyimgpr-js{% endif %}">
+  {% case product.images.size %}
+  {% when 0 %}
+  <img class="img-fluid" src="{{ 'no_image.png' | asset_url }}" alt="" />
+  {% when 1 %}
+    <div class="product__img_wrap">
+      <img class="{% if is_zoom %}item-zoom-js{% endif %} lazyload lazypreload"
+          {% if is_zoom %}
+            data-zoom-image="{{ product.featured_image.src | product_img_url: product_image_zoom_size, scale: product_image_scale }}"
+          {% endif %}
+           src="{{ product.featured_image.src | product_img_url: pr_img_min_size }}"
+           data-src="{{ fpr_img_url }}"
+           data-widths="[157, 270, 360, 540, 720, 900]"
+           data-sizes="auto"
+           alt="{{ product.featured_image.alt }}" />
+    </div>
+  {% else %}
+
+    <div id="gallery_big-{{ section.id }}" class="swiper-container gallery_cover">
+      {% if product.images.size > 1 and settings.pg_modalgallery %}
+        <a  id="btnImgGallery" class="product__img_zoom">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 7H22V9H16V3H18V7ZM8 9H2V7H6V3H8V9ZM18 17V21H16V15H22V17H18ZM8 15V21H6V17H2V15H8Z" fill="black"/>
+          </svg>
+        </a>
+      {% endif %}
+      
+      {% render 'product-badge' %}
+      
+      <div class="swiper-wrapper">
+        <div class="swiper-slide">
+          <img class="{% if is_zoom %}item-zoom-js{% endif %} w-100 lazyload lazypreload"
+                {% if is_zoom %}
+                  data-zoom-image="{{ product.featured_image.src | product_img_url:  product_image_zoom_size, scale: product_image_scale }}"
+                {% endif %}
+               id="primary_img_{{ section.id }}"
+               src="{{ product.featured_image.src | product_img_url: pr_img_min_size }}"
+               data-src="{{ fpr_img_url }}"
+               data-widths="[157, 270, 360, 540, 720, 900]"
+               data-sizes="auto"
+               alt="{{ product.images.first.alt }}" />
+        </div>
+        
+        {% for image in product.images offset:1 %}
+          {%- assign image = image.src -%}
+          {%- assign product_img_url = image | product_img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+          <div class="swiper-slide">
+            <img class="{% if is_zoom %}item-zoom-js{% endif %} w-100 lazyload lazypreload"
+                 {% if is_zoom %}
+                   data-zoom-image="{{ image.src | product_img_url: product_image_zoom_size, scale: product_image_scale }}"
+                 {% endif %}
+                 src="{{ image.src | product_img_url: pr_img_min_size }}"
+                 data-src="{{ product_img_url }}"
+                 data-widths="[157, 270, 360, 540, 720, 900]"
+                 data-sizes="auto"
+                 alt="{{ image.alt }}" />
+          </div>
+        {% endfor %}
+      </div>
+      {% if settings.pg_pag %}
+        <div id="pagination_{{ section.id }}" class="swiper-pagination sw-pb"></div>
+      {% endif %}
+      {% if settings.pg_fraction %}
+        <div class="swiper-counter"></div>
+      {% endif %}
+      {% if settings.pg_nav %}
+        <div class="swiper-button-prev button-cover-prev"><span>{{ 'layout.pagination.previous' | t }}</span></div>
+        <div class="swiper-button-next button-cover-next"><span>{{ 'layout.pagination.next' | t }}</span></div>
+      {% endif %}
+    </div>
+    
+    <div id="gallery_thumbs-{{ section.id }}" class="swiper-container gallery_thumbs" {% unless settings.pg_thumbshide %} style="margin-top:{{ settings.pg_spacebi }}px" {% endunless %}>
+      <div class="swiper-wrapper {% if settings.pg_thumbshide %} visibility-h{% endif %}">
+        {% for image in product.images %}
+          {%- assign image = image.src -%}
+          {%- assign product_img_url = image | product_img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+          <div class="swiper-slide" data-k="{{ image.aspect_ratio }}">
+            {% if settings.pg_modalgallery %}
+            <a class="image-gallery no-click"
+               rel="fancybox"
+               data-thumbnail="{{ image.src | product_img_url: product_image_thumb, crop: img_alignment }}"
+               href="{{ image.src | product_img_url: product_image_zoom_size, crop: img_alignment }}">
+              <img class="lazyload lazypreload"
+                   src="{% include 'srcEmpty' %}"
+                   data-src="{{ image.src | product_img_url: product_image_thumb, crop: img_alignment }}" alt="{{ image.alt }}"/>
+            </a>
+            {% endif %}
+            <img class="lazyload lazypreload w-100"
+                 src="{{ image.src | product_img_url: pr_img_min_size }}"
+                 data-src="{{ product_img_url }}"
+                 data-widths="[157, 270]"
+                 data-sizes="auto"
+                 alt="{{ image.alt }}" />
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+  {% endcase %}
+  </div>
+</div>
+
+{% when 'sticky'  %}
+    {%- assign product_info_class = 'col-lg-6 col-xl-5' -%}
+<div class="single_product__img col-12 col-lg-6 col-xl-7 mb-2 mb-md-0">
+  <div class="product-sticky-image">
+     {% render 'product-badge' %}
+    {% if product.images.size > 1 %}
+      <a  id="btnImgGalleryST" class="product__img_zoom">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 7H22V9H16V3H18V7ZM8 9H2V7H6V3H8V9ZM18 17V21H16V15H22V17H18ZM8 15V21H6V17H2V15H8Z" fill="black"/>
+        </svg>
+      </a>
+    {% endif %}
+    {% case product.images.size %}
+    {% when 0 %}
+    <div class="product__img_wrap">
+      <img class="img-fluid" data-src="{{ 'no_image.png' | asset_url }}" alt="">
+    </div>
+    {% when 1 %}
+    <div class="product__img_wrap">
+      <img class="lazyload lazypreload {% if is_zoom %} item-zoom-inner-js{% endif %}"
+          {% if is_zoom %}
+            data-zoom-image="{{ product.featured_image.src | product_img_url:  product_image_zoom_size, scale: product_image_scale }}"
+          {% endif %}
+           src="{{ product.featured_image.src | product_img_url: pr_img_min_size }}"
+           data-src="{{ fpr_img_url }}"
+           data-widths="[157, 270, 360, 540, 720, 900]"
+           data-sizes="auto"
+           alt="{{ product.featured_image.alt }}" />
+    </div>
+    {% else %}
+    {% for image in product.images %}
+      {%- assign image = image.src -%}
+      {%- assign product_img_url = image | product_img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+      <a class="image-gallery product__img_wrap col-6 col-sm-4 col-md-3 col-lg-12"
+             rel="fancybox"
+             data-thumbnail="{{ image.src | product_img_url: product_image_thumb, crop: img_alignment }}"
+             href="{{ image.src | product_img_url: product_image_zoom_size, crop: img_alignment }}">
+        
+        <img class="img-fluid lazyload lazypreload {% if is_zoom %} item-zoom-lens-js{% endif %}"
+              {% if is_zoom %}
+                  data-zoom-image="{{ image.src | product_img_url: product_image_zoom_size, scale: product_image_scale }}"
+              {% endif %}
+             src="{{ image.src | product_img_url: pr_img_min_size }}"
+             data-src="{{ product_img_url }}"
+             data-widths="[157, 270, 360, 540, 720, 900]"
+             data-sizes="auto"
+             alt="{{ image.alt }}" />
+      </a>
+    {% endfor %}
+    {% endcase %}
+  </div>
+</div>
+
+{% when 'tile'  %}
+	{%- assign product_info_class = 'col-md-6 col-lg-5 stickyimgprheight-js' -%}
+<div class="single_product__img col-12 col-md-6 col-lg-7">
+    <div class="product-tile-image {% if use_pg_sticky %} stickyimgpr-js{% endif %}">
+    {% render 'product-badge' %}
+    {% if product.images.size > 1 %}
+      <a  id="btnImgGalleryTile" class="product__img_zoom">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 7H22V9H16V3H18V7ZM8 9H2V7H6V3H8V9ZM18 17V21H16V15H22V17H18ZM8 15V21H6V17H2V15H8Z" fill="black"/>
+        </svg>
+      </a>
+    {% endif %}
+      <ul class="product__img_wrap">
+      {% case product.images.size %}
+        {% when 0 %}
+        <li>
+          <img class="img-fluid" src="{{ 'no_image.png' | asset_url }}" alt="">
+        </li>
+
+      {% when 1 %}
+      <li class="d-flex flex-column">
+        <img class="img-fluid {% if is_zoom %} item-zoom-inner-js{% endif %} lazyload lazypreload"
+            {% if is_zoom %}
+              data-zoom-image="{{ product.featured_image.src | product_img_url: product_image_zoom_size, scale: product_image_scale }}"
+            {% endif %}
+             src="{{ product.featured_image.src | product_img_url: pr_img_min_size }}"
+             data-src="{{ fpr_img_url }}"
+             data-widths="[157, 270, 360, 540, 720, 900]"
+             data-sizes="auto"
+             alt="{{ product.featured_image.alt }}">
+      </li>
+
+      {% else %}
+      
+     
+        {%- for image in product.images -%}
+          {%- assign image = image.src -%}
+          {%- assign product_img_url = image | product_img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+          
+          <li>
+            <a class="product__img_item image-gallery tile" rel="fancybox"
+               data-thumbnail="{{ image.src | product_img_url: product_image_thumb, crop: img_alignment }}"
+               data-thumbnail-color="{{ image.alt }}"
+               href="{{ image.src | product_img_url: product_image_zoom_size, crop: img_alignment }}">
+    
+              <img class="lazyload lazypreload img-fluid w-100 {% if is_zoom %} item-zoom-inner-js{% endif %}"
+                  {% if is_zoom %}
+                    data-zoom-image="{{ image.src | product_img_url:  product_image_zoom_size, scale: product_image_scale }}"
+                  {% endif %}
+                   src="{{ image.src | product_img_url: pr_img_min_size }}"
+                   data-src="{{ product_img_url }}"
+                   data-widths="[157, 270, 360, 540, 720, 900]"
+                   data-sizes="auto"
+                   alt="{{ image.alt }}" />
+            </a>
+          </li>
+       
+        {%- endfor -%}
+        {% endcase %}
+      </ul>
+    </div>
+  <style>
+      .type_tile .product__img_wrap {
+          margin-left: -{{ settings.pg_spacebtilei | divided_by: 2  }}px;
+          margin-right: -{{ settings.pg_spacebtilei | divided_by: 2  }}px;
+      }
+      .type_tile .product__img_wrap > li {
+          padding-left: {{ settings.pg_spacebtilei | divided_by: 2 }}px;
+          padding-right: {{ settings.pg_spacebtilei | divided_by: 2 }}px;
+          flex: 1 0 calc(50% - {{ settings.pg_spacebtilei }}px);
+          margin: 0 0 {{ settings.pg_spacebtilei }}px;
+      }
+  </style>
+</div>
+
+{% when 'carousel-big'  %}
+{%- assign product_info_class = 'container-small container-small-570 mt-3 text-center' -%}
+
+<div class="single_product__img col-12 text-center">
+
+  {% if product.images.size > 1 and settings.pg_modalgallery %}
+    <a  id="btnImgGallery" class="product__img_zoom">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 7H22V9H16V3H18V7ZM8 9H2V7H6V3H8V9ZM18 17V21H16V15H22V17H18ZM8 15V21H6V17H2V15H8Z" fill="black"/>
+      </svg>
+    </a>
+  {% endif %}
+
+  {% case product.images.size %}
+  {% when 0 %}
+  <img src="{{ 'no_image.png' | asset_url }}" alt="" />
+  {% when 1 %}
+  <img  class="img-fluid lazyload lazypreload {% if is_zoom %} item-zoom{% endif %}"
+        id="primary_img_{{ section.id }}" src="{% include 'srcEmpty' %}"
+        {% if is_zoom %}
+          data-zoom-image="{{ product.featured_image.src | product_img_url:  product_image_zoom_size, scale: product_image_scale }}"
+        {% endif %}
+        data-src="{{ product.featured_image.src | product_img_url: '390x491', crop: img_alignment }}"
+        alt="{{ product.featured_image.alt }}" />
+  {% else %}
+  
+  <div id="gallery_thumbs-{{ section.id }}" class="gallery_thumbs swiper-container">
+    {% render 'product-badge' %}
+    <div class="swiper-wrapper">
+      <div class="swiper-slide">
+      {% if settings.pg_modalgallery %}
+          <a class="image-gallery no-click"
+             rel="fancybox"
+             data-thumbnail="{{ product.featured_image.src | product_img_url: product_image_thumb, crop: img_alignment }}"
+             href="{{ product.featured_image.src | product_img_url: product_image_zoom_size, crop: img_alignment }}">
+            <img class="img-fluid w-100 lazyload lazypreload"
+                 src="{% include 'srcEmpty' %}"
+                 data-src="{{  product.featured_image.src | product_img_url: product_image_zoom_size, crop: img_alignment }}" alt="{{ product.featured_image.alt }}" />
+          </a>
+      {% endif %}
+        <div class="product__img_wrap">
+          <img class="img-fluid lazyload lazypreload {% if is_zoom %} item-zoom-lens-js{% endif %}"
+            {% if is_zoom %}
+               data-zoom-image="{{ product.featured_image.src | product_img_url:  product_image_zoom_size, scale: product_image_scale }}"
+            {% endif %}
+               id="primary_img_{{ section.id }}"
+               src="{{ product.featured_image.src | product_img_url: pr_img_min_size }}"
+               data-src="{{ fpr_img_url }}"
+               data-widths="[157, 270, 360, 540, 720, 900]"
+               data-sizes="auto"
+               alt="{{ product.images.first.alt }}" />
+        </div>
+      </div>
+  
+      {% for image in product.images offset:1 %}
+        {%- assign image = image.src -%}
+        {%- assign product_img_url = image | product_img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+        <div class="swiper-slide">
+          {% if settings.pg_modalgallery %}
+            <a class="image-gallery no-click"
+               rel="fancybox"
+               data-thumbnail="{{ image.src | product_img_url: product_image_thumb, crop: img_alignment }}"
+               href="{{ image.src | product_img_url: product_image_zoom_size, crop: img_alignment }}">
+              <img class="img-fluid w-100 lazyload lazypreload"
+                   data-src="{{  product.featured_image.src | product_img_url: 'x1000', crop: img_alignment }}"
+                   alt="{{ product.images.first.alt }}" />
+            </a>
+          {% endif %}
+          <img class="img-fluid w-100 lazyload lazypreload {% if is_zoom %} item-zoom-lens-js{% endif %}"
+            {% if is_zoom %}
+               data-zoom-image="{{ image.src | product_img_url:  product_image_zoom_size, scale: product_image_scale }}"
+             {% endif %}
+               src="{{ image.src | product_img_url: pr_img_min_size }}"
+               data-src="{{ product_img_url }}"
+               data-widths="[157, 270, 360, 540, 720, 900]"
+               data-sizes="auto"
+               alt="{{ image.alt }}" />
+        </div>
+      {% endfor %}
+    </div>
+    {% if settings.pg_fraction %}
+      <div class="swiper-pagination swiper-counter"></div>
+    {% endif %}
+    <div class="swiper-button-prev button-thumbs-prev"><span>{{ 'layout.pagination.previous' | t }}</span></div>
+    <div class="swiper-button-next button-thumbs-next"><span>{{ 'layout.pagination.next' | t }}</span></div>
+  </div>
+   
+   <div id="gallery_big-{{ section.id }}" class="gallery_cover swiper-container">
+     <div class="swiper-wrapper">
+       {% for image in product.images %}
+         {%- assign image = image.src -%}
+         {%- assign product_img_url = image | product_img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+         <div class="swiper-slide">
+           <img  class="img-fluid lazyload lazypreload thumb"
+                 src="{{ image.src | product_img_url: pr_img_min_size }}"
+                 data-src="{{ product_img_url }}"
+                 data-widths="[157, 270, 360, 540, 720, 900]"
+                 data-sizes="auto"
+                 alt="{{ image.alt }}" />
+         </div>
+       {% endfor %}
+     </div>
+   </div>
+
+  {% endcase %}
+</div>
+{% endcase %}

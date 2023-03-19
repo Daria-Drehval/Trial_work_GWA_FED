@@ -1,0 +1,57 @@
+<div class="header-main d-none d-xl-block">
+	<div class="container">
+		<div class="row align-items-xl-center justify-content-between" style="min-height: {{ ss_item.htheight }}px">
+			<div class="col-xl position-static d-flex justify-content-{{ ss_item.megamenu_position }} align-items-center">
+				{% if section.settings.megamenu_toggle %}
+					<div data-responsive-id="megamenu" data-responsive-layout="desktop">
+						{% include 'main-megamenu' %}
+					</div>
+				{% endif %}
+			</div>
+			<div class="col-xl d-xl-flex justify-content-center">
+				<div data-responsive-id="logo-shop" data-responsive-layout="desktop">
+					{% include 'header-logo' %}
+				</div>
+			</div>
+			<div class="col-xl d-flex justify-content-end align-items-center position-static header_items_wrapper">
+				{% if shop.customer_accounts_enabled and section.settings.header_user %}
+					<div class="item_left_spacer" data-responsive-id="header-account" data-responsive-layout="desktop">
+						{% include 'header-account' class: 'only_icon' %}
+					</div>
+				{% endif %}
+				
+				{% if section.settings.header_search %}
+					<div class="item_left_spacer {% if ajax_search == false %}order-xl-first mr-xl-2{% endif %}" data-responsive-id="header-search" data-responsive-layout="desktop">
+						{% if ajax_search %}
+							{% include 'header-search' %}
+						{% else %}
+							{% include "search-content" %}
+						{% endif %}
+					</div>
+				{% endif %}
+				
+				{% if section.settings.enable_header_wishlist %}
+					<div class="item_left_spacer" data-responsive-id="wishlist" data-responsive-layout="desktop">
+						{% include "header-wishlist" %}
+					</div>
+				{% endif %}
+				
+				{% if section.settings.header_cart %}
+					<div class="item_left_spacer" data-responsive-id="shopping-cart" data-responsive-layout="desktop">
+						{%- assign ajax_cart = section.settings.ajax_cart -%}
+						{% include 'header-cart' ajax: ajax_cart, style: 'type_2' %}
+					</div>
+				{% endif %}
+				
+				{% unless topbar and section.settings.header_tb_cs %}
+					{%- if settings.supported_currencies.size > 1 and section.settings.use_currency_selector  -%}
+						<div class="item_left_spacer" data-responsive-id="currency-selector" data-responsive-layout="desktop">
+							{% include "header-currency" %}
+						</div>
+					{%- endif -%}
+				{% endunless %}
+			</div>
+		</div>
+	</div>
+</div>
+																	  

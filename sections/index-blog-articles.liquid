@@ -1,0 +1,277 @@
+{% case section.settings.section_blog_limit %}
+	{% when '1'  %}{%- assign item_class = 'col-12' -%}
+	{% when '2' %}{%- assign item_class = 'col-12 col-md-6 two-column mb-4 mb-md-0' -%}
+	{% when '3'  %}{%- assign item_class = 'col-12 col-md-4 three-column mb-4 mb-md-0' -%}
+	{% when '4'  %}{%- assign item_class = 'col-12 col-md-4 col-lg-3 four-column mb-4 mb-md-0' -%}
+	{% when '5'  %}{%- assign item_class = 'col-12 col-md-4 col-lg-auto five-column mb-4 mb-md-0' -%}
+{% endcase %}
+
+{%- assign item = section.settings -%}
+{%- assign postCount = section.settings.section_blog_limit | plus: 0 -%}
+{%- assign postView = section.settings.post_view -%}
+
+
+<div class="section-style-{{ section.id }}">
+	{%- include 'section-style' -%}
+	<div class="{{ section.settings.container_width }}">
+		<div class="blog__main">
+			{% if section.settings.section_title.size > 0 %}
+				<h4 class="section_heading mb-0 {% if section.settings.post_view == '1' %} text-center{% else %} col-xl-3 px-0 text-left{% endif %}"><span>{{ section.settings.section_title }}</span></h4>
+			{% endif %}
+
+			{%- assign section_blog = blogs[section.settings.section_blog] -%}
+
+			{% unless section_blog.empty? %}
+	
+		{% if postCount > 2  %}
+			<div id="zmz-carousel-{{ section.id }}" class="swiper-container zmz-swiper-container mt-4 swiper-nav-wrapper {% if section.settings.post_view == '1' %} swiper-nav-wrapper_mod{% endif %}"
+				 data-options='{
+						"observer": true,
+						"observeParents": true,
+						"pagination": {"el": "#pagination_{{ section.id }}", {% if section.settings.carousel_control_type == 'fraction' %}"type": "fraction"{% elsif section.settings.carousel_control_type == 'progressbar' %}"type": "progressbar"{% else %}"clickable": true{% endif %}},
+						"navigation": {"nextEl": "#next_{{ section.id }}", "prevEl": "#prev_{{ section.id }}"},
+						"spaceBetween": {% if section.settings.reset_indent == 'true' %}0{% else %}30{% endif %},
+						"slidesPerView": 1,
+						{% if section.settings.carousel_control_type == 'fraction' %}"slidesPerGroup": 1, {% endif %}
+						"breakpoints": {
+							"640": { "slidesPerView": 2{% if section.settings.carousel_control_type == 'fraction' %}, "slidesPerGroup": 2 {% endif %}  },
+							"1024": {"slidesPerView": {{ postView }} {% if section.settings.carousel_control_type == 'fraction' %}, "slidesPerGroup": {{ postView }} {% endif %} }
+						}
+					}'>
+			
+			<div class="swiper-wrapper mx-0 mb-3">
+				{%  for article in section_blog.articles limit: postCount %}
+					<div class="swiper-slide">
+						{% if section.settings.post_view == '1' %}
+							{% include 'blog-listing-item' %}
+						{% else %}
+							{% include 'blog-grid-item' %}
+						{% endif %}
+					</div>
+				{% endfor %}
+			</div>
+			{% unless section.settings.off_carousel_pag %}
+				<div id="pagination_{{ section.id }}" class="swiper-pagination"></div>
+			{% endunless %}
+			{% unless section.settings.off_carousel_nav %}
+				<div id="prev_{{ section.id }}" class="swiper-button-prev"></div>
+				<div id="next_{{ section.id }}" class="swiper-button-next"></div>
+			{% endunless %}
+		</div>
+	{% else %}
+		<div class="row{% if section.settings.reset_indent == 'true' %} gx-0{% endif %}">
+			{% for article in section_blog.articles limit: postCount %}
+				<div class="{{ item_class }}">
+					{% if section.settings.section_blog_limit == '1' %}
+						{% include 'blog-listing-item' %}
+					{% else %}
+						{% include 'blog-grid-item' %}
+					{% endif %}
+				</div>
+			{% endfor %}
+		</div>
+	{% endif %}
+	{% endunless %}
+		</div>
+	</div>
+</div>
+
+{% schema %}
+{
+	"name": "Blog articles",
+	"tag": "section",
+	"class": "section section_homepage index_section_blog-articles",
+	"settings": [
+		{
+			"type":      "select",
+			"id":        "container_width",
+			"label":     "Container width",
+			"options": [
+				{
+					"value": "container",
+					"label": "Box"
+				},
+				{
+					"value": "container-fluid",
+					"label": "Container Fluid"
+				},
+				{
+					"value": "full-width",
+					"label": "Full"
+				}
+			],
+			"default":   "container"
+		},
+		
+		{
+			"type": "checkbox",
+			"id": "reset_indent",
+			"label": "Remove indent",
+			"default":   false
+		},
+		{
+			"type": "text",
+			"id": "inset_section",
+			"label": "Inset Section",
+			"default": "0px 0px 0px 0px",
+			"info": "inset: Top Right Bottom Left (px/em/%/). Or use one value if all insets are equal"
+		},
+		
+		{
+			"type": "text",
+			"id": "offset_section",
+			"label": "Offset Section",
+			"default": "0px 0px 0px 0px",
+			"info": "offset: Top Right Bottom Left"
+		},
+		
+		{
+			"type": "color",
+			"id": "bg_section",
+			"label": "Background Section",
+			"default": "#ffffff"
+		},
+		{
+			"type": "text",
+			"id": "section_title",
+			"label": "Heading",
+			"default": "Blog"
+		},
+		{
+			"type": "blog",
+			"id": "section_blog",
+			"label": "Blog"
+		},
+		{
+			"type": "select",
+			"id": "section_blog_limit",
+			"label": "Show posts",
+			"default": "4",
+			"options": [
+				{
+					"value": "1",
+					"label": "1"
+				},
+				{
+					"value": "2",
+					"label": "2"
+				},
+				{
+					"value": "3",
+					"label": "3"
+				},
+				{
+					"value": "4",
+					"label": "4"
+				},
+				{
+					"value": "5",
+					"label": "5"
+				}
+			]
+		},
+
+		{
+			"type": "checkbox",
+			"id": "blog_show_info",
+			"label": "Show info",
+			"default": true
+		},
+		
+		{
+			"type": "checkbox",
+			"id": "blog_show_author",
+			"label": "Show author",
+			"default": true
+		},
+		
+		{
+			"type": "checkbox",
+			"id": "blog_show_date",
+			"label": "Show date",
+			"default": true
+		},
+		
+		{
+			"type": "checkbox",
+			"id": "show_comments",
+			"label": "Show comments",
+			"default": true
+		},
+
+
+		{
+			"type": "header",
+			"content": "Carousel settings"
+		},
+
+		{
+		"type": "select",
+		"id": "post_view",
+		"label": "Carousel post view",
+			"options": [
+				{
+					"value": "1",
+					"label": "1"
+				},
+				{
+					"value": "2",
+					"label": "2"
+				},
+				{
+					"value": "3",
+					"label": "3"
+				},
+				{
+					"value": "4",
+					"label": "4"
+				}
+			],
+			"default": "3"
+		},
+	
+		{
+			"type": "checkbox",
+			"id": "off_carousel_nav",
+			"label": "Disable carousel navigation",
+			"default":  false
+		},
+		{
+			"type": "checkbox",
+			"id": "off_carousel_pag",
+			"label": "Disable carousel pagination",
+			"default":  false
+		},
+		{
+			"type": "select",
+			"id": "carousel_control_type",
+			"label": "Pagination type",
+			"options": [
+				{
+					"value": "pagination",
+					"label": "Bullets"
+				},
+				{
+					"value": "fraction",
+					"label": "Fraction"
+				},
+				{
+					"value": "progressbar",
+					"label": "Progressbar"
+				}
+			],
+			"default": "pagination"
+		}
+	],
+	"presets": [
+		{
+			"name": "Blog articles",
+			"category": "Blog",
+			"settings": {
+				"section_blog": "News",
+				"section_blog_limit": "4"
+			}
+		}
+	]
+}
+{% endschema %}
