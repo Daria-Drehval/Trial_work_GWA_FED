@@ -1,0 +1,62 @@
+<div class="productItem">
+  <div class="productItem__content">
+    <div class="productItem__imageWrapper productItem__image--{{ section.settings.image_width }}">
+      {%- if product.metafields.custom.custom_image -%}
+        {%- render 'lazy-img', class: 'productItem__image', src: product.metafields.custom.custom_image, alt: product.title -%}
+      {%- else -%}
+        {%- render 'lazy-img', class: 'productItem__image', src: product.featured_image.src, alt: product.title -%}
+      {%- endif -%}
+      {%- if section.settings.show_video_on_hover and product.metafields.custom.video -%}
+        <div class="productItem__video">
+          <video autoplay muted loop>
+            <source src="{{ product.metafields.custom.video.value | video_tag }}">
+          </video>
+        </div>
+      {%- endif -%}
+    </div>
+    <div class="productItem__info">
+      <div class="productItem__title h6">
+        {{- product.title -}}
+      </div>
+      <div class="productItem__priceWrapper">
+        {%- if product.compare_at_price > product.price -%}
+          <p class="productItem__price--compare">
+            {{- product.compare_at_price | money -}}
+          </p>
+        {%- endif -%}
+        <p class="productItem__price">
+          {{- product.price | money -}}
+        </p>
+      </div>
+      {%- form 'product', product, class: "productItem__form", novalidate: 'novalidate' -%}
+        <input type="hidden" name="quantity" value="1" readonly class="productItem__formQuantityValue">
+        {%- unless product.has_only_default_variant -%}
+          {%- for option in product.options_with_values -%}
+            <div class="productItem__variants">
+              <select data-product-handle="{{- product.handle -}}" name="id" class="productIdSelect--js">
+                {%- for variant in product.variants -%}
+                  <option class="productSection__variantOption" value="{{- variant.id -}}">{{- variant.title -}}</option>
+                {%- endfor -%}
+              </select>
+            </div>
+          {%- endfor -%}
+        {%- else -%}
+          {%- for variant in product.variants -%}
+            {%- if variant.available -%}
+              <input type="hidden" value="{{- variant.id -}}" data-product-handle="{{- product.handle -}}" name="id" class="productItem__variantSelect">
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endunless -%}
+        <div class="productItem__button">
+          <button data-product="add" class="productItem__formButton button" type="submit" {% unless product.available %} disabled{% endunless %}>
+            {%- if product.available -%}
+              {{- 'products.product.add_to_cart' | t -}}
+            {%- else -%}
+              {{- 'products.product.sold_out' | t -}}
+            {%- endif -%}
+          </button>
+        </div>
+      {%- endform -%}
+    </div>
+  </div>
+</div>
