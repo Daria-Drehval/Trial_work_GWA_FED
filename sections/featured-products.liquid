@@ -1,0 +1,133 @@
+<section class="featuredProducts__section container--{{ section.settings.container_width }}">
+  {{ 'product-item.css' | asset_url | stylesheet_tag }}
+  {{ 'featured-products.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'product-item.js' | asset_url }}" defer="defer"></script>
+
+  <h3 class="featuredProducts__sectionTitle">{{ section.settings.title }}</h3>
+
+  <div class="featuredProducts__content slider">
+    <div class="featuredProducts__contentSlider desktop--{{ section.settings.products_count }} mobile--{{ section.settings.products_count_mobile }}">
+      {%- for product in section.settings.collection.products -%}
+        <div class="productItem__card slide">
+          {%- render 'product-item', product: product -%}
+          <div class="productItem__button">
+            <a href="{{- product.url -}}" class="button">
+              {{- 'products.product.shop_now' | t -}}
+            </a>
+          </div>
+          {%- if section.settings.quick_add -%}
+            <button class="featuredProducts__quickButton button">
+              {{- 'products.product.quick_add' | t -}}
+            </button>
+            <div class="featuredProducts__quickModal">
+              <div class="productItem__modal">
+                {%- render 'product-item', product: product -%}
+                {%- render 'icon-close-small' -%}
+              </div>
+            </div>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    </div>
+
+    <div class="featuredProducts__sliderButtons">
+      <button class="prev-arrow">
+        <svg width="8" height="14" viewBox="0 0 12 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 18L5.73968 11.6904C4.81128 10.7547 4.81128 9.24532 5.73968 8.30961L12 2L10 8.74228e-07L1.69706 8.30294C0.759801 9.2402 0.759799 10.7598 1.69706 11.6971L10 20L12 18Z" fill="white"/>
+        </svg>
+      </button>
+      <button class="next-arrow">
+        <svg width="8" height="14" viewBox="0 0 12 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M-1.12852e-06 18L6.26032 11.6904C7.18872 10.7547 7.18872 9.24532 6.26032 8.30961L-2.52728e-06 2L2 8.74228e-07L10.3029 8.30294C11.2402 9.2402 11.2402 10.7598 10.3029 11.6971L2 20L-1.12852e-06 18Z" fill="white"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+</section>
+{% schema %}
+{
+  "name": "Featured products",
+  "class": "featuredProducts",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "default": "Featured products",
+      "label": "Section heading"
+    },
+    {
+      "type": "select",
+      "id": "container_width",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "wide",
+          "label": "Wide"
+        }
+      ],
+      "default": "standard",
+      "label": "Container width"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_count",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 4,
+      "label": "Products amount"
+    },
+    {
+      "type": "range",
+      "id": "products_count_mobile",
+      "min": 1,
+      "max": 3,
+      "step": 1,
+      "default": 2,
+      "label": "Products amount mobile"
+    },
+    {
+      "type": "select",
+      "id": "image_width",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "wide",
+          "label": "Wide"
+        }
+      ],
+      "default": "standard",
+      "label": "Image width"
+    },
+    {
+      "type": "checkbox",
+      "id": "quick_add",
+      "default": false,
+      "label": "Show quick add"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_video_on_hover",
+      "default": true,
+      "label": "Show video on hover"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured products"
+    }
+  ]
+}
+{% endschema %}
